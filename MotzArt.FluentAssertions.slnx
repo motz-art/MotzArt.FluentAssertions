@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="MotzArt.FluentAssertions.Tests/MotzArt.FluentAssertions.Tests.csproj" />
+  <Project Path="MotzArt.FluentAssertions/MotzArt.FluentAssertions.csproj" />
+</Solution>
