@@ -15,7 +15,13 @@ public class BooleanAssertionsTests
     public void ShouldBeTrue_ShouldFailWhenNotTrue()
     {
         var variable = !true;
-        ShouldThrowAssertionException(() => variable.ShouldBeTrue(), $"  Assert.That({nameof(variable)}, Is.True)\r\n  Expected: True\r\n  But was:  False\r\n");
+        ShouldThrowAssertionException(() => variable.ShouldBeTrue())
+            .Message.ShouldBe($"""
+                                 Assert.That({nameof(variable)}, Is.True)
+                                 Expected: True
+                                 But was:  False
+
+                               """);
     }
 
     [Test]
