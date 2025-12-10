@@ -1,5 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 
+namespace MotzArt.FluentAssertions.Tests;
+
 public static class StringExtensions
 {
     [return: NotNullIfNotNull(nameof(str))]
