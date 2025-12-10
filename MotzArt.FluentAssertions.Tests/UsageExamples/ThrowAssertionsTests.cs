@@ -1,7 +1,7 @@
-﻿using MotzArt.FluentAssertions;
-
-// Recommended use of ThrowAssertions.
+﻿// Recommended use of ThrowAssertions.
 using static MotzArt.FluentAssertions.ThrowAssertions;
+
+namespace MotzArt.FluentAssertions.Tests.UsageExamples;
 
 [TestFixture]
 public class ThrowAssertionsTests
