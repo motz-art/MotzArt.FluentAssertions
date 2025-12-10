@@ -56,7 +56,7 @@ public class ThrowAssertionsTests
 }
 
 [TestFixture]
-public class MistTests
+public class MiscTests
 {
     [Test]
     public void ChainAssertions()
