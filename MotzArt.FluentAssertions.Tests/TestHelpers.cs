@@ -11,9 +11,4 @@ public static class TestHelpers
     {
         return await act.ShouldThrowAsync<AssertionException>();
     }
-
-    public static void ShouldThrowAssertionException(Action act, string message)
-    {
-        act.ShouldThrowWithMessage<AssertionException>(message);
-    }
 }
