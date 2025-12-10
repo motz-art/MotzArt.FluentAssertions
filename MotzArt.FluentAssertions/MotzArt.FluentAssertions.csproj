@@ -1,19 +1,43 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<Title>MotzArt.FluentAssertions</Title>
+		<Authors>MotzArt</Authors>
+		<Description>Fluent assertion library for NUnit that provides intuitive, chainable assertion methods designed for static null analysis.</Description>
+		<Copyright>MotzArt</Copyright>
+		<PackageProjectUrl>https://github.com/motz-art/MotzArt.FluentAssertions</PackageProjectUrl>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<RepositoryUrl>https://github.com/motz-art/MotzArt.FluentAssertions</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<PackageTags>NUnit Fluent Assertions; NUnit; Assertions; Fluent; Assertion</PackageTags>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
+		<Version>1.0.0-beta</Version>
+		<GenerateDocumentationFile>True</GenerateDocumentationFile>
+		<IncludeSymbols>True</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<AnalysisLevel>latest-recommended</AnalysisLevel>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="MotzArt.FluentStrings" Version="1.0.2" />
-    <PackageReference Include="MotzArt.NullChecks" Version="1.0.2" />
-    <PackageReference Include="NUnit" Version="4.4.0" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="MotzArt.FluentStrings" Version="1.0.2" />
+		<PackageReference Include="MotzArt.NullChecks" Version="1.0.2" />
+		<PackageReference Include="NUnit" Version="4.4.0" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Helpers\" />
-  </ItemGroup>
+	<ItemGroup>
+		<Folder Include="Helpers\" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="..\README.md">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+	</ItemGroup>
 
 </Project>
