@@ -34,7 +34,13 @@ public class BooleanAssertionsTests
     public void ShouldBeFalse_ShouldFailWhenNotFalse()
     {
         var variable = !false;
-        ShouldThrowAssertionException(() => variable.ShouldBeFalse(), $"  Assert.That({nameof(variable)}, Is.False)\r\n  Expected: False\r\n  But was:  True\r\n");
+        ShouldThrowAssertionException(() => variable.ShouldBeFalse())
+            .Message.ShouldBe($"""
+                                 Assert.That({nameof(variable)}, Is.False)
+                                 Expected: False
+                                 But was:  True
+
+                               """);
     }
 
     [Test]
@@ -49,7 +55,13 @@ public class BooleanAssertionsTests
     [TestCase(null)]
     public void ShouldBeTrue_WithNullableBoolean_ShouldFailWhenNotTrue(bool? variable)
     {
-        ShouldThrowAssertionException(() => variable.ShouldBeTrue(), $"  Assert.That({nameof(variable)}, Is.True)\r\n  Expected: True\r\n  But was:  {(variable == null ? "null" : variable.ToString())}\r\n");
+        ShouldThrowAssertionException(() => variable.ShouldBeTrue())
+            .Message.ShouldBe($"""
+                                 Assert.That({nameof(variable)}, Is.True)
+                                 Expected: True
+                                 But was:  {(variable == null ? "null" : variable.ToString())}
+
+                               """);
     }
 
     [Test]
@@ -64,7 +76,13 @@ public class BooleanAssertionsTests
     [TestCase(null)]
     public void ShouldBeFalse_WithNullableBoolean_ShouldFailWhenNotFalse(bool? variable)
     {
-        ShouldThrowAssertionException(() => variable.ShouldBeFalse(), $"  Assert.That({nameof(variable)}, Is.False)\r\n  Expected: False\r\n  But was:  {(variable == null ? "null" : variable.ToString())}\r\n");
+        ShouldThrowAssertionException(() => variable.ShouldBeFalse())
+            .Message.ShouldBe($"""
+                                 Assert.That({nameof(variable)}, Is.False)
+                                 Expected: False
+                                 But was:  {(variable == null ? "null" : variable.ToString())}
+
+                               """);
     }    
     
     [Test]

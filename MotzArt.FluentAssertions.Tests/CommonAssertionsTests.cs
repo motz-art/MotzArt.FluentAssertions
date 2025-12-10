@@ -19,7 +19,12 @@ public class CommonAssertionsTests
         var actual = 5;
         var expected = 10;
         TestHelpers.ShouldThrowAssertionException(() => actual.ShouldBe(expected))
-            .Message.ShouldBe($"  Assert.That({nameof(actual)}, Is.EqualTo(expectedValue))\r\n  Expected: 10\r\n  But was:  5\r\n");
+            .Message.ShouldBe($"""
+                                 Assert.That({nameof(actual)}, Is.EqualTo(expectedValue))
+                                 Expected: 10
+                                 But was:  5
+
+                               """);
     }
 
     [Test]
@@ -58,7 +63,12 @@ public class CommonAssertionsTests
         var actual = 5;
         var expected = 5;
         TestHelpers.ShouldThrowAssertionException(() => actual.ShouldNotBe(expected))
-            .Message.ShouldBe($"  Assert.That({nameof(actual)}, Is.Not.EqualTo(expectedValue))\r\n  Expected: not equal to 5\r\n  But was:  5\r\n");
+            .Message.ShouldBe($"""
+                                 Assert.That({nameof(actual)}, Is.Not.EqualTo(expectedValue))
+                                 Expected: not equal to 5
+                                 But was:  5
+
+                               """);
     }
 
     [Test]
