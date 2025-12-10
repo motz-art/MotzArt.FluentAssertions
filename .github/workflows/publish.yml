@@ -2,7 +2,7 @@ name: Upload dotnet package
 
 on:
   release:
-    types: [created]
+    types: [published]
 
 jobs:
   deploy:
@@ -23,7 +23,13 @@ jobs:
         run: dotnet pack --configuration Release --include-symbols --include-source --output ./nuget-packages
 
       - name: Publish the package to NuGet
-        run: dotnet nuget push ./nuget-packages/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
-
+        run: |
+          for pkg in ./nuget-packages/MotzArt.FluentAssertions.*.nupkg; do
+            dotnet nuget push "$pkg" --api-key ${{ secrets.NUGET_API_KEY }} --skip-duplicate --source https://api.nuget.org/v3/index.json
+          done
+        
       - name: Publish the symbols package to NuGet
-        run: dotnet nuget push ./nuget-packages/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+        run: |
+          for pkg in ./nuget-packages/MotzArt.FluentAssertions.*.snupkg; do
+            dotnet nuget push "$pkg" --api-key ${{ secrets.NUGET_API_KEY }} --skip-duplicate --source https://api.nuget.org/v3/index.json
+          done
