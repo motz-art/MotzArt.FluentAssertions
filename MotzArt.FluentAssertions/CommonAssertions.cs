@@ -89,11 +89,20 @@ public static class CommonAssertions
         return value.ShouldNotBeNull();
     }
 
+    [Obsolete("This method will be removed. Use ShouldNotBeOfType<T>(this object? value, Type type, NUnitString message = default) instead because it preserves type of original parameter.")]
     [return: NotNullIfNotNull(nameof(value))]
     public static object? ShouldNotBeOfType<T>(this object? value, NUnitString message = default,
         [CallerArgumentExpression(nameof(value))] string valueExpression = ValueExpressionPlaceholder) where T : class
     {
         Assert.That(value, Is.Not.InstanceOf<T>(), message, actualExpression: valueExpression, constraintExpression: $"Is.Not.InstanceOf<{typeof(T).DescribeType()}>()");
+        return value;
+    }
+
+    [return: NotNullIfNotNull(nameof(value))]
+    public static T? ShouldNotBeOfType<T>(this T? value, Type type, NUnitString message = default,
+        [CallerArgumentExpression(nameof(value))] string valueExpression = ValueExpressionPlaceholder) where T : class
+    {
+        Assert.That(value, Is.Not.InstanceOf(type), message, actualExpression: valueExpression, constraintExpression: $"Is.Not.InstanceOf({typeof(T).DescribeType()})");
         return value;
     }
 }

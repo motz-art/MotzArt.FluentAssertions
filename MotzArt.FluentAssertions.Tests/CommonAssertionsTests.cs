@@ -293,15 +293,17 @@ public class CommonAssertionsTests
                                """);
     }
 
+#pragma warning disable CS0618 // Type or member is obsolete
     [Test]
-    public void ShouldNotBeOfType_ShouldPassForIncorrectType()
+    public void Obsolete_ShouldNotBeOfType_ShouldPassForIncorrectType()
     {
         object? value = DataProvider.DefaultTestClass;
-        value.ShouldNotBeOfType<string>();
+        var result = value.ShouldNotBeOfType<string>();
+        result.ShouldBeSameAs(value);
     }
 
     [Test]
-    public void ShouldNotBeOfType_ShouldFailForCorrectType()
+    public void Obsolete_ShouldNotBeOfType_ShouldFailForCorrectType()
     {
         object? value = DataProvider.DefaultTestClass;
         TestHelpers.ShouldThrowAssertionException(() => value.ShouldNotBeOfType<TestClass>())
@@ -311,5 +313,43 @@ public class CommonAssertionsTests
                                  But was:  <MotzArt.FluentAssertions.Tests.TestData.TestClass>
                                
                                """);
+    }
+
+    [Test]
+    public void Obsolete_ShouldNotBeOfType_ShouldPassForNull()
+    {
+        object? value = null;
+        var result = value.ShouldNotBeOfType<string>();
+        result.ShouldBeSameAs(value);
+    }
+#pragma warning restore CS0618 // Type or member is obsolete
+
+    [Test]
+    public void ShouldNotBeOfType_ShouldPassForIncorrectType()
+    {
+        object? value = DataProvider.DefaultTestClass;
+        var result = value.ShouldNotBeOfType(typeof(string));
+        result.ShouldBeSameAs(value);
+    }
+
+    [Test]
+    public void ShouldNotBeOfType_ShouldFailForCorrectType()
+    {
+        object? value = DataProvider.DefaultTestClass;
+        TestHelpers.ShouldThrowAssertionException(() => value.ShouldNotBeOfType(typeof(TestClass)))
+            .Message.ShouldBe($"""
+                                 Assert.That({nameof(value)}, Is.Not.InstanceOf(TestClass))
+                                 Expected: not instance of <MotzArt.FluentAssertions.Tests.TestData.TestClass>
+                                 But was:  <MotzArt.FluentAssertions.Tests.TestData.TestClass>
+
+                               """);
+    }
+
+    [Test]
+    public void ShouldNotBeOfType_ShouldPassForNull()
+    {
+        object? value = null;
+        var result = value.ShouldNotBeOfType(typeof(string));
+        result.ShouldBeSameAs(value);
     }
 }
