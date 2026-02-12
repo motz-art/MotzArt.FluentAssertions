@@ -228,7 +228,7 @@ public class CommonAssertionsTests
     [Test]
     public void Generic_ShouldBeOfType_ShouldPassForCorrectType()
     {
-        object? value = DataProvider.DefaultTestClass;
+        object value = DataProvider.DefaultTestClass;
         var result = value.ShouldBeOfType<TestClass>();
         result.ShouldBe(DataProvider.DefaultTestClass);
     }
@@ -236,7 +236,7 @@ public class CommonAssertionsTests
     [Test]
     public void Generic_ShouldBeOfType_ShouldFailForIncorrectType()
     {
-        object? value = DataProvider.DefaultTestClass;
+        object value = DataProvider.DefaultTestClass;
         TestHelpers.ShouldThrowAssertionException(() => value.ShouldBeOfType<string>())
             .Message.ShouldBe($"""
                                  Assert.That({nameof(value)}, Is.InstanceOf<String>())
@@ -262,7 +262,7 @@ public class CommonAssertionsTests
     [Test]
     public void ShouldBeOfType_ShouldPassForCorrectType()
     {
-        object? value = DataProvider.DefaultTestClass;
+        object value = DataProvider.DefaultTestClass;
         var result = value.ShouldBeOfType(typeof(TestClass));
         result.ShouldBeSameAs(value);
     }
@@ -270,7 +270,7 @@ public class CommonAssertionsTests
     [Test]
     public void ShouldBeOfType_ShouldFailForIncorrectType()
     {
-        object? value = DataProvider.DefaultTestClass;
+        object value = DataProvider.DefaultTestClass;
         TestHelpers.ShouldThrowAssertionException(() => value.ShouldBeOfType(typeof(string)))
             .Message.ShouldBe($"""
                                  Assert.That({nameof(value)}, Is.InstanceOf(String))
@@ -297,7 +297,7 @@ public class CommonAssertionsTests
     [Test]
     public void Obsolete_ShouldNotBeOfType_ShouldPassForIncorrectType()
     {
-        object? value = DataProvider.DefaultTestClass;
+        object value = DataProvider.DefaultTestClass;
         var result = value.ShouldNotBeOfType<string>();
         result.ShouldBeSameAs(value);
     }
@@ -305,7 +305,7 @@ public class CommonAssertionsTests
     [Test]
     public void Obsolete_ShouldNotBeOfType_ShouldFailForCorrectType()
     {
-        object? value = DataProvider.DefaultTestClass;
+        object value = DataProvider.DefaultTestClass;
         TestHelpers.ShouldThrowAssertionException(() => value.ShouldNotBeOfType<TestClass>())
             .Message.ShouldBe($"""
                                  Assert.That({nameof(value)}, Is.Not.InstanceOf<TestClass>())
@@ -327,7 +327,7 @@ public class CommonAssertionsTests
     [Test]
     public void ShouldNotBeOfType_ShouldPassForIncorrectType()
     {
-        object? value = DataProvider.DefaultTestClass;
+        object value = DataProvider.DefaultTestClass;
         var result = value.ShouldNotBeOfType(typeof(string));
         result.ShouldBeSameAs(value);
     }
@@ -335,7 +335,7 @@ public class CommonAssertionsTests
     [Test]
     public void ShouldNotBeOfType_ShouldFailForCorrectType()
     {
-        object? value = DataProvider.DefaultTestClass;
+        object value = DataProvider.DefaultTestClass;
         TestHelpers.ShouldThrowAssertionException(() => value.ShouldNotBeOfType(typeof(TestClass)))
             .Message.ShouldBe($"""
                                  Assert.That({nameof(value)}, Is.Not.InstanceOf(TestClass))
