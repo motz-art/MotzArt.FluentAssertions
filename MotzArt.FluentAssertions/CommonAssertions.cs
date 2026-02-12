@@ -81,6 +81,14 @@ public static class CommonAssertions
         return (T)value.ShouldNotBeNull();
     }
 
+    [return: NotNull]
+    public static T ShouldBeOfType<T>(this T? value, Type type, NUnitString message = default,
+        [CallerArgumentExpression(nameof(value))] string valueExpression = ValueExpressionPlaceholder) where T : class
+    {
+        Assert.That(value, Is.InstanceOf(type), message, actualExpression: valueExpression, constraintExpression: $"Is.InstanceOf({type.DescribeType()})");
+        return value.ShouldNotBeNull();
+    }
+
     [return: NotNullIfNotNull(nameof(value))]
     public static object? ShouldNotBeOfType<T>(this object? value, NUnitString message = default,
         [CallerArgumentExpression(nameof(value))] string valueExpression = ValueExpressionPlaceholder) where T : class

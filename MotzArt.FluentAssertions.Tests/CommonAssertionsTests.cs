@@ -31,7 +31,7 @@ public class CommonAssertionsTests
     public void ShouldBe_WithEqualityComparer_ShouldPassForEquivalentValues()
     {
         var actual = DataProvider.DefaultTestClass;
-        var expected = DataProvider.CreateTestClass(id:2, name: DataProvider.DefaultTestClassName);
+        var expected = DataProvider.CreateTestClass(id: 2, name: DataProvider.DefaultTestClassName);
         actual.ShouldBe(expected, new TestClassComparerByName());
     }
 
@@ -226,7 +226,7 @@ public class CommonAssertionsTests
     }
 
     [Test]
-    public void ShouldBeOfType_ShouldPassForCorrectType()
+    public void Generic_ShouldBeOfType_ShouldPassForCorrectType()
     {
         object? value = DataProvider.DefaultTestClass;
         var result = value.ShouldBeOfType<TestClass>();
@@ -234,7 +234,7 @@ public class CommonAssertionsTests
     }
 
     [Test]
-    public void ShouldBeOfType_ShouldFailForIncorrectType()
+    public void Generic_ShouldBeOfType_ShouldFailForIncorrectType()
     {
         object? value = DataProvider.DefaultTestClass;
         TestHelpers.ShouldThrowAssertionException(() => value.ShouldBeOfType<string>())
@@ -247,7 +247,7 @@ public class CommonAssertionsTests
     }
 
     [Test]
-    public void ShouldBeOfType_ShouldFailForNullValue()
+    public void Generic_ShouldBeOfType_ShouldFailForNullValue()
     {
         object? value = null;
         TestHelpers.ShouldThrowAssertionException(() => value.ShouldBeOfType<string>())
@@ -258,7 +258,41 @@ public class CommonAssertionsTests
                                
                                """);
     }
-    
+
+    [Test]
+    public void ShouldBeOfType_ShouldPassForCorrectType()
+    {
+        object? value = DataProvider.DefaultTestClass;
+        var result = value.ShouldBeOfType(typeof(TestClass));
+        result.ShouldBeSameAs(value);
+    }
+
+    [Test]
+    public void ShouldBeOfType_ShouldFailForIncorrectType()
+    {
+        object? value = DataProvider.DefaultTestClass;
+        TestHelpers.ShouldThrowAssertionException(() => value.ShouldBeOfType(typeof(string)))
+            .Message.ShouldBe($"""
+                                 Assert.That({nameof(value)}, Is.InstanceOf(String))
+                                 Expected: instance of <System.String>
+                                 But was:  <MotzArt.FluentAssertions.Tests.TestData.TestClass>
+
+                               """);
+    }
+
+    [Test]
+    public void ShouldBeOfType_ShouldFailForNullValue()
+    {
+        object? value = null;
+        TestHelpers.ShouldThrowAssertionException(() => value.ShouldBeOfType(typeof(string)))
+            .Message.ShouldBe($"""
+                                 Assert.That({nameof(value)}, Is.InstanceOf(String))
+                                 Expected: instance of <System.String>
+                                 But was:  null
+
+                               """);
+    }
+
     [Test]
     public void ShouldNotBeOfType_ShouldPassForIncorrectType()
     {
