@@ -106,7 +106,7 @@ public class NumberAssertionsTests
     [Test]
     public void ShouldBeInRange_ShouldPassWhenValueIsInRange()
     {
-        5.ShouldBeInRage(0, 10).ShouldBe(5);
+        5.ShouldBeInRange(0, 10).ShouldBe(5);
     }
 
     [Test]
@@ -114,13 +114,13 @@ public class NumberAssertionsTests
     [TestCase(9.9, TestName = "Value on maximum boundary of the range")]
     public void ShouldBeInRange_ShouldPassWhenDecimalValueIsOnBoundaryOfTheRange(decimal value)
     {
-        value.ShouldBeInRage(1.5m, 9.9m).ShouldBe(value);
+        value.ShouldBeInRange(1.5m, 9.9m).ShouldBe(value);
     }
 
     [Test]
     public void ShouldBeInRange_ShouldFailWhenValueIsOutOfRange()
     {
-        ShouldThrowAssertionException(() => 15.ShouldBeInRage(0, 10))
+        ShouldThrowAssertionException(() => 15.ShouldBeInRange(0, 10))
             .Message.ShouldBe("""
                                 Assert.That(15, Is.InRange(0, 10))
                                 Expected: in range (0,10)
@@ -135,7 +135,7 @@ public class NumberAssertionsTests
     [TestCase(10.01, TestName = "Value just above the maximum boundary")]
     public void ShouldBeInRange_ShouldFailWhenDecimalValueIsOutOfRange(decimal value)
     {
-        ShouldThrowAssertionException(() => value.ShouldBeInRage(5m, 10m))
+        ShouldThrowAssertionException(() => value.ShouldBeInRange(5m, 10m))
             .Message.ShouldBe($"""
                                 Assert.That(value, Is.InRange(5m, 10m))
                                 Expected: in range (5,10)
@@ -149,7 +149,7 @@ public class NumberAssertionsTests
     [TestCase(15, TestName = "Value is greater then maximum boundary of the range")]
     public void ShouldNotBeInRange_ShouldPassWhenValueIsOutOfRange(int value)
     {
-        value.ShouldNotBeInRage(0, 10).ShouldBe(value);
+        value.ShouldNotBeInRange(0, 10).ShouldBe(value);
     }
 
     [Test]
@@ -157,13 +157,13 @@ public class NumberAssertionsTests
     [TestCase(10.01, TestName = "Value is greater then maximum boundary of the range")]
     public void ShouldNotBeInRange_ShouldPassWhenValueIsOutOfRange(decimal value)
     {
-        value.ShouldNotBeInRage(0, 10).ShouldBe(value);
+        value.ShouldNotBeInRange(0, 10).ShouldBe(value);
     }
 
     [Test]
     public void ShouldNotBeInRange_ShouldFailWhenValueIsInRange()
     {
-        ShouldThrowAssertionException(() => 5.ShouldNotBeInRage(0, 10))
+        ShouldThrowAssertionException(() => 5.ShouldNotBeInRange(0, 10))
             .Message.ShouldBe("""
                                 Assert.That(5, Is.Not.InRange(0, 10))
                                 Expected: not in range (0,10)
@@ -175,7 +175,7 @@ public class NumberAssertionsTests
     [Test]
     public void ShouldNotBeInRange_ShouldFailWhenValueIsOnBoundaryOfTheRange()
     {
-        ShouldThrowAssertionException(() => 0.ShouldNotBeInRage(0, 10))
+        ShouldThrowAssertionException(() => 0.ShouldNotBeInRange(0, 10))
             .Message.ShouldBe("""
                                 Assert.That(0, Is.Not.InRange(0, 10))
                                 Expected: not in range (0,10)

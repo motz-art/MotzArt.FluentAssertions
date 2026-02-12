@@ -31,13 +31,13 @@ public static class NumberAssertions
         return value;
     }
 
-    public static T ShouldBeInRage<T>(this T value, T minValue, T maxValue, NUnitString message = default, [CallerArgumentExpression(nameof(value))] string valueExpression = "") where T : IComparable
+    public static T ShouldBeInRange<T>(this T value, T minValue, T maxValue, NUnitString message = default, [CallerArgumentExpression(nameof(value))] string valueExpression = "") where T : IComparable
     {
         Assert.That(value, Is.InRange(minValue, maxValue), message, actualExpression: valueExpression, constraintExpression: $"Is.InRange({minValue.DescribeValue()}, {maxValue.DescribeValue()})");
         return value;
     }
 
-    public static T ShouldNotBeInRage<T>(this T value, T minValue, T maxValue, NUnitString message = default, [CallerArgumentExpression(nameof(value))] string valueExpression = "") where T : IComparable
+    public static T ShouldNotBeInRange<T>(this T value, T minValue, T maxValue, NUnitString message = default, [CallerArgumentExpression(nameof(value))] string valueExpression = "") where T : IComparable
     {
         Assert.That(value, Is.Not.InRange(minValue, maxValue), message, actualExpression: valueExpression, constraintExpression: $"Is.Not.InRange({minValue.DescribeValue()}, {maxValue.DescribeValue()})");
         return value;
