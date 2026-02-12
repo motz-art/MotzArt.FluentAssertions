@@ -1,3 +1,5 @@
+using MotzArt.FluentAssertions.Helpers;
+
 namespace MotzArt.FluentAssertions.Tests;
 
 using static TestHelpers;
@@ -101,4 +103,44 @@ public class NumberAssertionsTests
 
     }
 
+    [Test]
+    public void ShouldBeInRange_ShouldPassWhenValueIsInRange()
+    {
+        5.ShouldBeInRage(0, 10).ShouldBe(5);
+    }
+
+    [Test]
+    [TestCase(1.5, TestName = "Value on minimum boundary of the range")]
+    [TestCase(9.9, TestName = "Value on maximum boundary of the range")]
+    public void ShouldBeInRange_ShouldPassWhenDecimalValueIsOnBoundaryOfTheRange(decimal value)
+    {
+        value.ShouldBeInRage(1.5m, 9.9m).ShouldBe(value);
+    }
+
+    [Test]
+    public void ShouldBeInRange_ShouldFailWhenValueIsOutOfRange()
+    {
+        ShouldThrowAssertionException(() => 15.ShouldBeInRage(0, 10))
+            .Message.ShouldBe("""
+                                Assert.That(15, Is.InRange(0, 10))
+                                Expected: in range (0,10)
+                                But was:  15
+
+                              """);
+
+    }
+
+    [Test]
+    [TestCase(4.99, TestName = "Value just below the minimum boundary")]
+    [TestCase(10.01, TestName = "Value just above the maximum boundary")]
+    public void ShouldBeInRange_ShouldFailWhenDecimalValueIsOutOfRange(decimal value)
+    {
+        ShouldThrowAssertionException(() => value.ShouldBeInRage(5m, 10m))
+            .Message.ShouldBe($"""
+                                Assert.That(value, Is.InRange(5m, 10m))
+                                Expected: in range (5,10)
+                                But was:  {value.DescribeValue()}
+
+                              """);
+    }
 }

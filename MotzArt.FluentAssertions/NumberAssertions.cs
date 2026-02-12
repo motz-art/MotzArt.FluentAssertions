@@ -1,3 +1,4 @@
+using MotzArt.FluentAssertions.Helpers;
 using NUnit.Framework;
 using System.Runtime.CompilerServices;
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
@@ -27,6 +28,12 @@ public static class NumberAssertions
     public static T ShouldBeLessThanOrEqual<T>(this T value, T expectedValue, NUnitString message = default, [CallerArgumentExpression(nameof(value))] string valueExpression = "") where T : IComparable
     {
         Assert.That(value, Is.LessThanOrEqualTo(expectedValue), message, actualExpression: valueExpression, constraintExpression: $"Is.LessThanOrEqualTo({expectedValue})");
+        return value;
+    }
+
+    public static T ShouldBeInRage<T>(this T value, T minValue, T maxValue, NUnitString message = default, [CallerArgumentExpression(nameof(value))] string valueExpression = "") where T : IComparable
+    {
+        Assert.That(value, Is.InRange(minValue, maxValue), message, actualExpression: valueExpression, constraintExpression: $"Is.InRange({minValue.DescribeValue()}, {maxValue.DescribeValue()})");
         return value;
     }
 }

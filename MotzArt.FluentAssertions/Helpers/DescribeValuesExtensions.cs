@@ -57,9 +57,13 @@ public static class DescribeValuesExtensions
         if (value is short s) return s.ToString(FormatProvider);
         if (value is ushort us) return us.ToString(FormatProvider);
         if (value is int i) return i.ToString(FormatProvider);
-        if (value is uint ui) return ui.ToString(FormatProvider);
-        if (value is long l) return l.ToString(FormatProvider);
-        if (value is ulong ul) return ul.ToString(FormatProvider);
+        if (value is uint ui) return ui.ToString(FormatProvider) + "u";
+        if (value is long l) return l.ToString(FormatProvider) + "L";
+        if (value is ulong ul) return ul.ToString(FormatProvider) + "UL";
+
+        if (value is float f) return f.ToString(FormatProvider) + "f";
+        if (value is double d) return d.ToString(FormatProvider) + "d";
+        if (value is decimal dec) return dec.ToString(FormatProvider) + "m";
 
         var hasCustomToString = HasCustomToString(value.GetType());
 
