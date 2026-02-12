@@ -102,7 +102,7 @@ public static class CommonAssertions
     public static T? ShouldNotBeOfType<T>(this T? value, Type type, NUnitString message = default,
         [CallerArgumentExpression(nameof(value))] string valueExpression = ValueExpressionPlaceholder) where T : class
     {
-        Assert.That(value, Is.Not.InstanceOf(type), message, actualExpression: valueExpression, constraintExpression: $"Is.Not.InstanceOf({typeof(T).DescribeType()})");
+        Assert.That(value, Is.Not.InstanceOf(type), message, actualExpression: valueExpression, constraintExpression: $"Is.Not.InstanceOf({type.DescribeType()})");
         return value;
     }
 }
