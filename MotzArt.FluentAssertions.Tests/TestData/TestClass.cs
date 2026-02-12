@@ -17,7 +17,7 @@ class TestClass : IEquatable<TestClass>
         if (obj is null) return false;
         if (ReferenceEquals(this, obj)) return true;
         if (obj.GetType() != GetType()) return false;
-        return Equals((TestClass) obj);
+        return Equals((TestClass)obj);
     }
 
     public override int GetHashCode()

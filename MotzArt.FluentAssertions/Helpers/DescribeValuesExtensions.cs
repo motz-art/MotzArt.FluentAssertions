@@ -1,7 +1,7 @@
+using MotzArt.NullChecks;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
-using MotzArt.NullChecks;
 
 namespace MotzArt.FluentAssertions.Helpers;
 
@@ -101,7 +101,7 @@ public static class DescribeValuesExtensions
 
         return type.Name;
     }
-    
+
     private static bool IsNullable(this Type type)
     {
         return type.IsValueType && type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);

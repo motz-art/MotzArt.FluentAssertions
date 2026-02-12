@@ -1,9 +1,7 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Runtime.CompilerServices;
-using System.Text;
-using MotzArt.FluentAssertions.Helpers;
-using MotzArt.FluentStrings;
+﻿using MotzArt.FluentAssertions.Helpers;
 using NUnit.Framework;
+using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 
 namespace MotzArt.FluentAssertions;
 
@@ -18,7 +16,7 @@ public static class StringAssertions
 
     public static string ShouldNotBeNullOrEmpty(this string? str, NUnitString message = default, [CallerArgumentExpression(nameof(str))] string strExpression = "")
     {
-        Assert.That(str, Is.Not.Null.And.Not.Empty, message, actualExpression: strExpression, constraintExpression:"Is.Not.NullOrEmpty");
+        Assert.That(str, Is.Not.Null.And.Not.Empty, message, actualExpression: strExpression, constraintExpression: "Is.Not.NullOrEmpty");
         return str.ShouldNotBeNull();
     }
 
@@ -27,7 +25,7 @@ public static class StringAssertions
         Assert.That(value, Is.Not.Null.And.Not.Empty.And.Not.WhiteSpace, message, actualExpression: valueExpression, constraintExpression: "Is.Not.NullOrWhitespace");
         return value!;
     }
-    
+
     public static void ShouldBeEmpty(this string str, NUnitString message = default, [CallerArgumentExpression(nameof(str))] string strExpression = "")
     {
         Assert.That(str, Is.Empty, message, actualExpression: strExpression);
@@ -44,16 +42,16 @@ public static class StringAssertions
         Assert.That(str, Does.StartWith(expectedStart), message, actualExpression: strExpression, constraintExpression: $"Does.StartWith({expectedStart})");
         return str.ShouldNotBeNull();
     }
-    
+
     public static string ShouldStartWith(this string? str, string expectedStart, StringComparison comparison, NUnitString message = default, [CallerArgumentExpression(nameof(str))] string strExpression = "")
     {
         if (str == null || !str.StartsWith(expectedStart, comparison))
         {
             var writer = new MessageWriter();
             writer.WriteMessageIfNotEmpty(message);
-            
+
             writer.WriteAssertThat(strExpression, $"Does.StartWith({DescribeValuesExtensions.FormatValue(expectedStart)}).Using({nameof(StringComparison)}.{comparison})");
-            
+
             writer.WriteExpected();
             writer.Write("String starting with ");
             writer.WriteValue(expectedStart);

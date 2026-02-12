@@ -16,15 +16,15 @@ public class ThrowAssertionsTests
     public void ShouldThrow_PassWhenExceptionIsThrown()
     {
         var message = ShouldThrow<InvalidOperationException>(throwsInvalidOperationException);
-        
+
         message.ShouldBeOfType<InvalidOperationException>().Message.ShouldBe(TestExceptionMessage);
     }
-    
+
     [Test]
     public void ShouldThrow_WithCatchAll_PassWhenExceptionIsThrown()
     {
         var message = ShouldThrow<Exception>(throwsInvalidOperationException);
-        
+
         message.ShouldBeOfType<InvalidOperationException>().Message.ShouldBe(TestExceptionMessage);
     }
 

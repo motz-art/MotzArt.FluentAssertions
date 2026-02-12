@@ -1,8 +1,6 @@
-﻿using System.Runtime.CompilerServices;
-using System.Text;
-using MotzArt.FluentAssertions.Helpers;
-using MotzArt.FluentStrings;
+﻿using MotzArt.FluentAssertions.Helpers;
 using NUnit.Framework;
+using System.Runtime.CompilerServices;
 
 namespace MotzArt.FluentAssertions;
 
@@ -61,7 +59,7 @@ public static class ReadOnlySpanAssertions
             writer.WriteLine($" Spans differ at index {diffIndex}.");
             writer.WriteExpected(expected.DescribeValue(skip: diffIndex));
             writer.WriteActual(actual.DescribeValue(skip: diffIndex));
-            
+
             writer.ReportFailure();
         }
 

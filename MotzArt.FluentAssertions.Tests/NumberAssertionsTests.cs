@@ -1,4 +1,5 @@
 namespace MotzArt.FluentAssertions.Tests;
+
 using static TestHelpers;
 
 [TestFixture]

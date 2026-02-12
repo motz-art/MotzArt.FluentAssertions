@@ -4,9 +4,9 @@
 public class BooleanAssertionsTests
 {
     [Test]
-    public void ShouldBeTrue_AssertTrue() 
-    { 
-        bool condition = 5 > 3; 
+    public void ShouldBeTrue_AssertTrue()
+    {
+        bool condition = 5 > 3;
         condition.ShouldBeTrue();
     }
 

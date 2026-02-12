@@ -6,7 +6,7 @@ public class StringAssertionsTests
     [Test]
     public void ShouldBe_AssertExactStringMatch()
     {
-        string value = "hello world"; 
+        string value = "hello world";
         value.ShouldBe("hello world");
     }
 

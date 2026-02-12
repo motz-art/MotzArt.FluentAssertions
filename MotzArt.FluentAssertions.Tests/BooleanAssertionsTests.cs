@@ -83,8 +83,8 @@ public class BooleanAssertionsTests
                                  But was:  {(variable == null ? "null" : variable.ToString())}
 
                                """);
-    }    
-    
+    }
+
     [Test]
     public void ShouldBeTrue_WithMessage_Success()
     {

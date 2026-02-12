@@ -1,5 +1,5 @@
-﻿using System.Runtime.CompilerServices;
-using NUnit.Framework;
+﻿using NUnit.Framework;
+using System.Runtime.CompilerServices;
 
 namespace MotzArt.FluentAssertions;
 
@@ -16,7 +16,7 @@ public static class BooleanAssertions
     {
         Assert.That(value, Is.False, message, actualExpression: valueExpression);
     }
-    
+
     public static void ShouldBeTrue(this bool? value, NUnitString message = default,
         [CallerArgumentExpression(nameof(value))] string valueExpression = "")
     {

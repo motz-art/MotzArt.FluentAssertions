@@ -1,7 +1,7 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Text;
-using MotzArt.FluentStrings;
+﻿using MotzArt.FluentStrings;
 using NUnit.Framework;
+using System.Diagnostics.CodeAnalysis;
+using System.Text;
 
 namespace MotzArt.FluentAssertions.Helpers;
 
@@ -105,10 +105,10 @@ internal class MessageWriter
     }
 
     public static string Create(
-        NUnitString message, 
-        string actualExpression, 
+        NUnitString message,
+        string actualExpression,
         string constraintExpression,
-        string expected, 
+        string expected,
         string actual)
     {
         var writer = new MessageWriter();

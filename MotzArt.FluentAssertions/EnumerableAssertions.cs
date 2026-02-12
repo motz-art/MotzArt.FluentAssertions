@@ -46,10 +46,10 @@ public static class EnumerableAssertions
         Assert.That(source, Is.Not.Null.And.Not.Empty, message, actualExpression, constraintExpression: "Is.Not.Empty");
         return source ?? throw new InvalidOperationException("UPS. This should not happen because of assert above.");
     }
-    
+
     [return: NotNull]
     public static T ShouldHaveCount<T>(
-        [NotNull] this T? actual, 
+        [NotNull] this T? actual,
         int count,
         NUnitString message = default,
         [CallerArgumentExpression(nameof(actual))] string actualExpression = "<some-value>") where T : IEnumerable
@@ -58,7 +58,7 @@ public static class EnumerableAssertions
         Assert.That(actual, Has.Exactly(count).Items, message, actualExpression, constraintExpression: $"Has.Exactly({count}).Items");
         return actual;
     }
-    
+
     public static T ShouldHasSingle<T>([NotNull] this IReadOnlyList<T>? source,
         NUnitString message = default,
         [CallerArgumentExpression(nameof(source))]

@@ -6,7 +6,7 @@ public class ReadOnlySpanAssertionsTests
     [Test]
     public void CheckSpanIsEmpty()
     {
-        ReadOnlySpan<int> span = Array.Empty<int>(); 
+        ReadOnlySpan<int> span = Array.Empty<int>();
         span.ShouldBeEmpty();
     }
 

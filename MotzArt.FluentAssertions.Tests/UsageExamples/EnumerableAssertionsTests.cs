@@ -6,7 +6,7 @@ public class EnumerableAssertionsTests
     [Test]
     public void ShouldBeEmpty_AssertNoItems()
     {
-        var list = new List<int>(); 
+        var list = new List<int>();
         list.ShouldBeEmpty();
     }
 

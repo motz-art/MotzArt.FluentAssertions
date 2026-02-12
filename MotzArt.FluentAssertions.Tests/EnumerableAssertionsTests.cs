@@ -19,7 +19,7 @@ public class EnumerableAssertionsTests
         var enumerable = Enumerable.Empty<int>();
         enumerable.ShouldBeEmpty();
     }
-    
+
     [Test]
     public void ShouldBeEmpty_WithNonEmptyArray_ShouldFailForNull()
     {
@@ -36,7 +36,7 @@ public class EnumerableAssertionsTests
     [Test]
     public void ShouldBeEmpty_WithNonEmptyArray_ShouldFailForNonEmptyArray()
     {
-        var array = new [] {1,2,3};
+        var array = new[] { 1, 2, 3 };
         ShouldThrowAssertionException(() => array.ShouldBeEmpty())
             .Message.ShouldBe($"""
                                  Assert.That({nameof(array)}, Is.Empty)
@@ -160,11 +160,11 @@ public class EnumerableAssertionsTests
     [Test]
     public void ShouldHaveCount_ShouldPassWhenCountMatches()
     {
-        int[] array = [1,2,3,4,5];
+        int[] array = [1, 2, 3, 4, 5];
         var result = array.ShouldHaveCount(5);
         result.ShouldBeSameAs(array);
     }
-    
+
     [Test]
     public void ShouldHaveCount_ShouldFailWhenCountNotMatches()
     {
@@ -177,7 +177,7 @@ public class EnumerableAssertionsTests
 
                                """);
     }
-    
+
     [Test]
     public void ShouldHaveCount_ShouldFailForNullSource()
     {
@@ -190,7 +190,7 @@ public class EnumerableAssertionsTests
     public void ShouldHasSingle_WithArray_ShouldPassForArrayWithOneItem()
     {
         var item = "The Item";
-        var array = new[] {item};
+        var array = new[] { item };
         var result = array.ShouldHasSingle();
         result.ShouldBeSameAs(item);
     }
@@ -211,7 +211,7 @@ public class EnumerableAssertionsTests
     [Test]
     public void ShouldHasSingle_WithArray_ShouldFailForArrayWithMultipleItems()
     {
-        var array = new [] {1, 2};
+        var array = new[] { 1, 2 };
         ShouldThrowAssertionException(() => array.ShouldHasSingle())
             .Message.ShouldBe($"""
                                  Assert.That({nameof(array)}, Has.Exactly(1).Items)
@@ -259,7 +259,7 @@ public class EnumerableAssertionsTests
     [Test]
     public void ShouldHasSingle_WithEnumerable_ShouldFailForEnumerableWithMultipleItems()
     {
-        var enumerable = Enumerable.Range(1,10);
+        var enumerable = Enumerable.Range(1, 10);
         ShouldThrowAssertionException(() => enumerable.ShouldHasSingle())
             .Message.ShouldBe($"""
                                  Assert.That({nameof(enumerable)}, Has.Exactly(1).Items)
@@ -286,7 +286,7 @@ public class EnumerableAssertionsTests
     public void ShouldHasSingle_WithPredicate_ShouldPassForArrayWithOneMatchingItem()
     {
         var item = "The Item";
-        var array = new[] {"a", "b", item, "C"};
+        var array = new[] { "a", "b", item, "C" };
         var result = array.ShouldHasSingle(x => x.Length > 3);
         result.ShouldBeSameAs(item);
     }
@@ -374,7 +374,7 @@ public class EnumerableAssertionsTests
     [Test]
     public void ShouldNotContain_ShouldFailWhenMatchingItemFound()
     {
-        var enumerable = Enumerable.Range(1,10);
+        var enumerable = Enumerable.Range(1, 10);
         ShouldThrowAssertionException(() => enumerable.ShouldNotContain(x => x > 0))
             .Message.ShouldBe($"""
                                  Assert.That({nameof(enumerable)}, Has.No.Items.Matching(x => x > 0))

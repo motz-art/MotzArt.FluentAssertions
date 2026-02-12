@@ -1,8 +1,8 @@
-using System.Diagnostics.CodeAnalysis;
-using System.Runtime.CompilerServices;
 using MotzArt.FluentAssertions.Helpers;
 using NUnit.Framework;
 using NUnit.Framework.Internal;
+using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 
 namespace MotzArt.FluentAssertions;
 
@@ -13,12 +13,12 @@ public static class ThrowAssertions
         NUnitString message = default,
         [CallerArgumentExpression(nameof(code))] string codeExpression = "") where TException : Exception
     {
-        return ShouldThrow<TException>((TestDelegate) (() => code()), message, codeExpression);
+        return ShouldThrow<TException>((TestDelegate)(() => code()), message, codeExpression);
     }
 
     public static TException ShouldThrow<TException>(
         TestDelegate code,
-        NUnitString message = default, 
+        NUnitString message = default,
         [CallerArgumentExpression(nameof(code))] string codeExpression = "") where TException : Exception
     {
         using var ctx = new TestExecutionContext.IsolatedContext();

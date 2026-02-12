@@ -7,7 +7,7 @@ public class MiscTests
     public void ChainAssertions()
     {
         var user = new { Name = "Alice", Age = 30 };
-        
+
         user
             .ShouldNotBeNull()
             .ShouldBeOfType<dynamic>();
@@ -28,7 +28,7 @@ public class MiscTests
     [Ignore("Test is designed to fail to demonstrate custom message functionality.")]
     public void WithCustomMessage()
     {
-        var value = 42; 
+        var value = 42;
         value.ShouldBe(43, message: "Expected the answer to be 43");
 
         //  Expected the answer to be 43
