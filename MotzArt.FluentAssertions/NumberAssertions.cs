@@ -6,23 +6,27 @@ namespace MotzArt.FluentAssertions;
 
 public static class NumberAssertions
 {
-    public static void ShouldBeGreaterThan<T>(this T value, T expectedValue, NUnitString message = default, [CallerArgumentExpression(nameof(value))] string valueExpression = "") where T : IComparable
+    public static T ShouldBeGreaterThan<T>(this T value, T expectedValue, NUnitString message = default, [CallerArgumentExpression(nameof(value))] string valueExpression = "") where T : IComparable
     {
         Assert.That(value, Is.GreaterThan(expectedValue), message, actualExpression: valueExpression, constraintExpression: $"Is.GreaterThan({expectedValue})");
+        return value;
     }
 
-    public static void ShouldBeGreaterThanOrEqual<T>(this T value, T expectedValue, NUnitString message = default, [CallerArgumentExpression(nameof(value))] string valueExpression = "") where T : IComparable
+    public static T ShouldBeGreaterThanOrEqual<T>(this T value, T expectedValue, NUnitString message = default, [CallerArgumentExpression(nameof(value))] string valueExpression = "") where T : IComparable
     {
         Assert.That(value, Is.GreaterThanOrEqualTo(expectedValue), message, actualExpression: valueExpression, constraintExpression: $"Is.GreaterThanOrEqualTo({expectedValue})");
+        return value;
     }
 
-    public static void ShouldBeLessThan<T>(this T value, T expectedValue, NUnitString message = default, [CallerArgumentExpression(nameof(value))] string valueExpression = "") where T : IComparable
+    public static T ShouldBeLessThan<T>(this T value, T expectedValue, NUnitString message = default, [CallerArgumentExpression(nameof(value))] string valueExpression = "") where T : IComparable
     {
         Assert.That(value, Is.LessThan(expectedValue), message, actualExpression: valueExpression, constraintExpression: $"Is.LessThan({expectedValue})");
+        return value;
     }
 
-    public static void ShouldBeLessThanOrEqual<T>(this T value, T expectedValue, NUnitString message = default, [CallerArgumentExpression(nameof(value))] string valueExpression = "") where T : IComparable
+    public static T ShouldBeLessThanOrEqual<T>(this T value, T expectedValue, NUnitString message = default, [CallerArgumentExpression(nameof(value))] string valueExpression = "") where T : IComparable
     {
         Assert.That(value, Is.LessThanOrEqualTo(expectedValue), message, actualExpression: valueExpression, constraintExpression: $"Is.LessThanOrEqualTo({expectedValue})");
+        return value;
     }
 }

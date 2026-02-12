@@ -8,19 +8,19 @@ public class NumberAssertionsTests
     [Test]
     public void ShouldBeGreaterThan_ShouldPassWhenValueIsGreater()
     {
-        1.ShouldBeGreaterThan(0);
+        1.ShouldBeGreaterThan(0).ShouldBe(1);
     }
 
     [Test]
     public void ShouldBeGreaterThan_ShouldPassWhenDoubleValueIsGreater()
     {
-        (0.1).ShouldBeGreaterThan(0.0);
+        (0.1).ShouldBeGreaterThan(0.0).ShouldBe(0.1);
     }
 
     [Test]
     public void ShouldBeGreaterThan_ShouldPassWhenDecimalValueIsGreater()
     {
-        (0.1m).ShouldBeGreaterThan(0.0m);
+        (0.1m).ShouldBeGreaterThan(0.0m).ShouldBe(0.1m);
     }
 
     [Test]
