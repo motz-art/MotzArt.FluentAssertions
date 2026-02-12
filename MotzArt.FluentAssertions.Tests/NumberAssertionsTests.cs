@@ -12,6 +12,18 @@ public class NumberAssertionsTests
     }
 
     [Test]
+    public void ShouldBeGreaterThan_ShouldPassWhenDoubleValueIsGreater()
+    {
+        (0.1).ShouldBeGreaterThan(0.0);
+    }
+
+    [Test]
+    public void ShouldBeGreaterThan_ShouldPassWhenDecimalValueIsGreater()
+    {
+        (0.1m).ShouldBeGreaterThan(0.0m);
+    }
+
+    [Test]
     [TestCase(0, 0, TestName = "Equal values")]
     [TestCase(0, 1, TestName = "Actual is less than expected")]
     public void ShouldBeGreaterThan_ShouldFailFor(int actual, int expected)
