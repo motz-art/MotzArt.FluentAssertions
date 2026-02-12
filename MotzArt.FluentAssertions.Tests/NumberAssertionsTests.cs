@@ -183,4 +183,41 @@ public class NumberAssertionsTests
 
                               """);
     }
+
+    [Test]
+    public void ShouldBeApproximately_ShouldPassWhenValueIsWithinTolerance()
+    {
+        9.8.ShouldBeApproximately(10.0, 0.3).ShouldBe(9.8);
+    }
+
+    [Test]
+    public void ShouldBeApproximately_ShouldFailWhenValueIsOutsideTolerance()
+    {
+        ShouldThrowAssertionException(() => 9.5.ShouldBeApproximately(10.0, 0.4))
+            .Message.ShouldBe("""
+                                Assert.That(9.5, Is.EqualTo(10d).Within(0.4d))
+                                Expected: 10.0d +/- 0.40000000000000002d
+                                But was:  9.5d
+                                Off by:   0.5d
+
+                              """);
+    }
+
+    [Test]
+    public void ShouldNotBeApproximately_ShouldPassWhenValueIsOutsideTolerance()
+    {
+        9.5.ShouldNotBeApproximately(10.0, 0.4).ShouldBe(9.5);
+    }
+
+    [Test]
+    public void ShouldNotBeApproximately_ShouldFailWhenValueIsWithinTolerance()
+    {
+        ShouldThrowAssertionException(() => 9.8.ShouldNotBeApproximately(10.0, 0.3))
+            .Message.ShouldBe("""
+                                Assert.That(9.8, Is.Not.EqualTo(10d).Within(0.3d))
+                                Expected: not equal to 10.0d +/- 0.29999999999999999d
+                                But was:  9.8000000000000007d
+
+                              """);
+    }
 }
