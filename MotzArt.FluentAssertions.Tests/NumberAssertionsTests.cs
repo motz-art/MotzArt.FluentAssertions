@@ -143,4 +143,44 @@ public class NumberAssertionsTests
 
                               """);
     }
+
+    [Test]
+    [TestCase(-1, TestName = "Value is less then minimum boundary of the range")]
+    [TestCase(15, TestName = "Value is greater then maximum boundary of the range")]
+    public void ShouldNotBeInRange_ShouldPassWhenValueIsOutOfRange(int value)
+    {
+        value.ShouldNotBeInRage(0, 10).ShouldBe(value);
+    }
+
+    [Test]
+    [TestCase(-0.01, TestName = "Value is less then minimum boundary of the range")]
+    [TestCase(10.01, TestName = "Value is greater then maximum boundary of the range")]
+    public void ShouldNotBeInRange_ShouldPassWhenValueIsOutOfRange(decimal value)
+    {
+        value.ShouldNotBeInRage(0, 10).ShouldBe(value);
+    }
+
+    [Test]
+    public void ShouldNotBeInRange_ShouldFailWhenValueIsInRange()
+    {
+        ShouldThrowAssertionException(() => 5.ShouldNotBeInRage(0, 10))
+            .Message.ShouldBe("""
+                                Assert.That(5, Is.Not.InRange(0, 10))
+                                Expected: not in range (0,10)
+                                But was:  5
+
+                              """);
+    }
+
+    [Test]
+    public void ShouldNotBeInRange_ShouldFailWhenValueIsOnBoundaryOfTheRange()
+    {
+        ShouldThrowAssertionException(() => 0.ShouldNotBeInRage(0, 10))
+            .Message.ShouldBe("""
+                                Assert.That(0, Is.Not.InRange(0, 10))
+                                Expected: not in range (0,10)
+                                But was:  0
+
+                              """);
+    }
 }
