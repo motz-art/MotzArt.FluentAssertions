@@ -9,7 +9,7 @@ public class ThrowAssertionsTests
     [Test]
     public void ShouldThrow_AssertSyncException()
     {
-        void TestMethod(string message)
+        void TestMethod(string? message)
         {
             if (message == null) throw new ArgumentNullException(nameof(message));
             // Do something...
