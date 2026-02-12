@@ -1,19 +1,23 @@
 using MotzArt.NullChecks;
+using System.Globalization;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
 namespace MotzArt.FluentAssertions.Helpers;
 
 public static class DescribeValuesExtensions
 {
+    private static IFormatProvider FormatProvider => CultureInfo.InvariantCulture;
+
     public static string DescribeValue<T>(this ReadOnlySpan<T> span, int skip = 0, int maxLength = 250)
     {
         if (span.Length == 0) return $"empty <ReadOnlySpan<{typeof(T).DescribeType()}>>";
 
         var sb = new StringBuilder();
 
-        sb.Append("[");
+        sb.Append('[');
 
         if (skip > 0)
         {
@@ -33,7 +37,7 @@ public static class DescribeValuesExtensions
             }
         }
 
-        sb.Append("]");
+        sb.Append(']');
 
         return sb.ToString();
     }
@@ -48,14 +52,14 @@ public static class DescribeValuesExtensions
         if (value is string str) return str;
         if (value is char ch) return FormatChar(ch);
 
-        if (value is byte b) return b.ToString();
-        if (value is sbyte sb) return sb.ToString();
-        if (value is short s) return s.ToString();
-        if (value is ushort us) return us.ToString();
-        if (value is int i) return i.ToString();
-        if (value is uint ui) return ui.ToString();
-        if (value is long l) return l.ToString();
-        if (value is ulong ul) return ul.ToString();
+        if (value is byte b) return b.ToString(FormatProvider);
+        if (value is sbyte sb) return sb.ToString(FormatProvider);
+        if (value is short s) return s.ToString(FormatProvider);
+        if (value is ushort us) return us.ToString(FormatProvider);
+        if (value is int i) return i.ToString(FormatProvider);
+        if (value is uint ui) return ui.ToString(FormatProvider);
+        if (value is long l) return l.ToString(FormatProvider);
+        if (value is ulong ul) return ul.ToString(FormatProvider);
 
         var hasCustomToString = HasCustomToString(value.GetType());
 

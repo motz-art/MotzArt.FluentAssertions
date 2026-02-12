@@ -1,6 +1,7 @@
 ﻿using MotzArt.FluentAssertions.Helpers;
 using NUnit.Framework;
 using System.Runtime.CompilerServices;
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
 namespace MotzArt.FluentAssertions;
 
