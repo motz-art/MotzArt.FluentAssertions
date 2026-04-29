@@ -5,7 +5,7 @@ using System.Text;
 
 namespace MotzArt.FluentAssertions.Helpers;
 
-internal class MessageWriter
+internal sealed class MessageWriter
 {
     private const int IndentSize = 2;
     private readonly StringBuilder sb = new();
