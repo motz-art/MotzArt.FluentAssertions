@@ -187,19 +187,19 @@ public class EnumerableAssertionsTests
     }
 
     [Test]
-    public void ShouldHasSingle_WithArray_ShouldPassForArrayWithOneItem()
+    public void ShouldHaveSingle_WithArray_ShouldPassForArrayWithOneItem()
     {
         var item = "The Item";
         var array = new[] { item };
-        var result = array.ShouldHasSingle();
+        var result = array.ShouldHaveSingle();
         result.ShouldBeSameAs(item);
     }
 
     [Test]
-    public void ShouldHasSingle_WithArray_ShouldFailForEmptyArray()
+    public void ShouldHaveSingle_WithArray_ShouldFailForEmptyArray()
     {
         var array = Array.Empty<int>();
-        ShouldThrowAssertionException(() => array.ShouldHasSingle())
+        ShouldThrowAssertionException(() => array.ShouldHaveSingle())
             .Message.ShouldBe($"""
                                  Assert.That({nameof(array)}, Has.Exactly(1).Items)
                                  Expected: exactly one item
@@ -209,10 +209,10 @@ public class EnumerableAssertionsTests
     }
 
     [Test]
-    public void ShouldHasSingle_WithArray_ShouldFailForArrayWithMultipleItems()
+    public void ShouldHaveSingle_WithArray_ShouldFailForArrayWithMultipleItems()
     {
         var array = new[] { 1, 2 };
-        ShouldThrowAssertionException(() => array.ShouldHasSingle())
+        ShouldThrowAssertionException(() => array.ShouldHaveSingle())
             .Message.ShouldBe($"""
                                  Assert.That({nameof(array)}, Has.Exactly(1).Items)
                                  Expected: exactly one item
@@ -222,10 +222,10 @@ public class EnumerableAssertionsTests
     }
 
     [Test]
-    public void ShouldHasSingle_WithArray_ShouldFailForNull()
+    public void ShouldHaveSingle_WithArray_ShouldFailForNull()
     {
         int[]? array = null;
-        ShouldThrowAssertionException(() => array.ShouldHasSingle())
+        ShouldThrowAssertionException(() => array.ShouldHaveSingle())
             .Message.ShouldBe($"""
                                  Assert.That({nameof(array)}, Is.Not.Null)
                                  Expected: not null
@@ -235,19 +235,19 @@ public class EnumerableAssertionsTests
     }
 
     [Test]
-    public void ShouldHasSingle_WithEnumerable_ShouldPassForEnumerableWithOneItem()
+    public void ShouldHaveSingle_WithEnumerable_ShouldPassForEnumerableWithOneItem()
     {
         var item = "The Item";
         var enumerable = Enumerable.Repeat(item, 1);
-        var result = enumerable.ShouldHasSingle();
+        var result = enumerable.ShouldHaveSingle();
         result.ShouldBeSameAs(item);
     }
 
     [Test]
-    public void ShouldHasSingle_WithEnumerable_ShouldFailForEmptyEnumerable()
+    public void ShouldHaveSingle_WithEnumerable_ShouldFailForEmptyEnumerable()
     {
         var enumerable = Enumerable.Empty<int>();
-        ShouldThrowAssertionException(() => enumerable.ShouldHasSingle())
+        ShouldThrowAssertionException(() => enumerable.ShouldHaveSingle())
             .Message.ShouldBe($"""
                                  Assert.That({nameof(enumerable)}, Has.Exactly(1).Items)
                                  Expected: exactly one item
@@ -257,10 +257,10 @@ public class EnumerableAssertionsTests
     }
 
     [Test]
-    public void ShouldHasSingle_WithEnumerable_ShouldFailForEnumerableWithMultipleItems()
+    public void ShouldHaveSingle_WithEnumerable_ShouldFailForEnumerableWithMultipleItems()
     {
         var enumerable = Enumerable.Range(1, 10);
-        ShouldThrowAssertionException(() => enumerable.ShouldHasSingle())
+        ShouldThrowAssertionException(() => enumerable.ShouldHaveSingle())
             .Message.ShouldBe($"""
                                  Assert.That({nameof(enumerable)}, Has.Exactly(1).Items)
                                  Expected: exactly one item
@@ -270,10 +270,10 @@ public class EnumerableAssertionsTests
     }
 
     [Test]
-    public void ShouldHasSingle_WithEnumerable_ShouldFailForNull()
+    public void ShouldHaveSingle_WithEnumerable_ShouldFailForNull()
     {
         IEnumerable<int>? enumerable = null;
-        ShouldThrowAssertionException(() => enumerable.ShouldHasSingle())
+        ShouldThrowAssertionException(() => enumerable.ShouldHaveSingle())
             .Message.ShouldBe($"""
                                  Assert.That({nameof(enumerable)}, Is.Not.Null)
                                  Expected: not null
@@ -283,19 +283,19 @@ public class EnumerableAssertionsTests
     }
 
     [Test]
-    public void ShouldHasSingle_WithPredicate_ShouldPassForArrayWithOneMatchingItem()
+    public void ShouldHaveSingle_WithPredicate_ShouldPassForArrayWithOneMatchingItem()
     {
         var item = "The Item";
         var array = new[] { "a", "b", item, "C" };
-        var result = array.ShouldHasSingle(x => x.Length > 3);
+        var result = array.ShouldHaveSingle(x => x.Length > 3);
         result.ShouldBeSameAs(item);
     }
 
     [Test]
-    public void ShouldHasSingle_WithPredicate_ShouldFailNoMatchingItemsFound()
+    public void ShouldHaveSingle_WithPredicate_ShouldFailNoMatchingItemsFound()
     {
         var enumerable = Enumerable.Empty<int>();
-        ShouldThrowAssertionException(() => enumerable.ShouldHasSingle(x => x > 0))
+        ShouldThrowAssertionException(() => enumerable.ShouldHaveSingle(x => x > 0))
             .Message.ShouldBe($"""
                                  Assert.That({nameof(enumerable)}, Has.Exactly(1).Item.Matching(x => x > 0))
                                  Expected: exactly one item
@@ -305,10 +305,10 @@ public class EnumerableAssertionsTests
     }
 
     [Test]
-    public void ShouldHasSingle_WithPredicate_ShouldFailForEnumerableWithMultipleItems()
+    public void ShouldHaveSingle_WithPredicate_ShouldFailForEnumerableWithMultipleItems()
     {
         var enumerable = Enumerable.Range(1, 10);
-        ShouldThrowAssertionException(() => enumerable.ShouldHasSingle(x => x > 1))
+        ShouldThrowAssertionException(() => enumerable.ShouldHaveSingle(x => x > 1))
             .Message.ShouldBe($"""
                                  Assert.That({nameof(enumerable)}, Has.Exactly(1).Item.Matching(x => x > 1))
                                  Expected: exactly one item
@@ -318,10 +318,10 @@ public class EnumerableAssertionsTests
     }
 
     [Test]
-    public void ShouldHasSingle_WithPredicate_ShouldFailForNull()
+    public void ShouldHaveSingle_WithPredicate_ShouldFailForNull()
     {
         IEnumerable<int>? enumerable = null;
-        ShouldThrowAssertionException(() => enumerable.ShouldHasSingle(x => x > 0))
+        ShouldThrowAssertionException(() => enumerable.ShouldHaveSingle(x => x > 0))
             .Message.ShouldBe($"""
                                  Assert.That({nameof(enumerable)}, Is.Not.Null)
                                  Expected: not null

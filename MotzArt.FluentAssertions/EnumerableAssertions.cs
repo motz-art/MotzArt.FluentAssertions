@@ -60,7 +60,7 @@ public static class EnumerableAssertions
         return actual;
     }
 
-    public static T ShouldHasSingle<T>([NotNull] this IReadOnlyList<T>? source,
+    public static T ShouldHaveSingle<T>([NotNull] this IReadOnlyList<T>? source,
         NUnitString message = default,
         [CallerArgumentExpression(nameof(source))]
         string actualExpression = "<some-value>")
@@ -70,7 +70,7 @@ public static class EnumerableAssertions
         return source[0];
     }
 
-    public static T ShouldHasSingle<T>(
+    public static T ShouldHaveSingle<T>(
         [NotNull] this IEnumerable<T>? actual,
         [CallerArgumentExpression(nameof(actual))] string actualExpression = "<some-value>")
     {
@@ -101,7 +101,7 @@ public static class EnumerableAssertions
         return result;
     }
 
-    public static T ShouldHasSingle<T>(
+    public static T ShouldHaveSingle<T>(
         [NotNull] this IEnumerable<T>? source,
         Func<T, bool> predicate,
         [CallerArgumentExpression(nameof(source))] string actualExpression = "<some-value>",

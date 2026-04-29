@@ -122,18 +122,18 @@ public class EnumerableAssertionsTests
     }
 
     [Test]
-    public void ShouldHasSingle_AssertExactlyOneItem()
+    public void ShouldHaveSingle_AssertExactlyOneItem()
     {
         var items = new List<string> { "only one" };
-        var single = items.ShouldHasSingle();
+        var single = items.ShouldHaveSingle();
         single.ShouldBe("only one");
     }
 
     [Test]
-    public void ShouldHasSingleWithPredicate_AssertSingleMatch()
+    public void ShouldHaveSingleWithPredicate_AssertSingleMatch()
     {
         var numbers = new List<int> { 1, 2, 3, 4, 5 };
-        var even = numbers.ShouldHasSingle(x => x == 2);
+        var even = numbers.ShouldHaveSingle(x => x == 2);
         even.ShouldBe(2);
     }
 
