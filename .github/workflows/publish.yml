@@ -17,10 +17,17 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
-      - run: dotnet build --configuration Release
+      - name: Resolve package version from release tag
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          VERSION="${RELEASE_TAG#v}"
+          echo "PACKAGE_VERSION=$VERSION" >> "$GITHUB_ENV"
+
+      - run: dotnet build --configuration Release /p:Version=$PACKAGE_VERSION
 
       - name: Create the package
-        run: dotnet pack --configuration Release --include-symbols --include-source --output ./nuget-packages
+        run: dotnet pack --configuration Release --no-build /p:Version=$PACKAGE_VERSION --include-symbols --include-source --output ./nuget-packages
 
       - name: Publish the package to NuGet
         run: |

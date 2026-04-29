@@ -16,7 +16,7 @@
 		<PackageTags>NUnit Fluent Assertions; NUnit; Assertions; Fluent; Assertion</PackageTags>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
-		<Version>1.1.0-beta.1.1</Version>
+		<Version Condition="'$(Version)' == ''">0.0.0-local</Version>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 		<IncludeSymbols>True</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
