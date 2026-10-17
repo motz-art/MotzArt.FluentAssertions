@@ -176,6 +176,19 @@ public static class EnumerableAssertions
     }
 
     [return: NotNull]
+    public static T ShouldBeSequenceEqualTo<T, TItem>(
+        [NotNull] this T? actual,
+        IEnumerable<TItem> expected,
+        NUnitString message = default,
+        [CallerArgumentExpression(nameof(actual))] string actualExpression = "<some-value>",
+        [CallerArgumentExpression(nameof(expected))] string expectedExpression = "<expected-value>") where T : IEnumerable<TItem>
+    {
+        return AssertSequenceEqual<T, TItem, TItem>(actual, expected, EqualityComparer<TItem>.Default.Equals, message, actualExpression, expectedExpression,
+            constraintExpression: $"Is.EqualTo({expectedExpression})");
+    }
+
+    // Fallback for expected values without an item type (e.g. empty collection expression): the item type can't be inferred from the constraint of the overload above.
+    [return: NotNull]
     public static IEnumerable<T> ShouldBeSequenceEqualTo<T>(
         [NotNull] this IEnumerable<T>? actual,
         IEnumerable<T> expected,
@@ -183,26 +196,41 @@ public static class EnumerableAssertions
         [CallerArgumentExpression(nameof(actual))] string actualExpression = "<some-value>",
         [CallerArgumentExpression(nameof(expected))] string expectedExpression = "<expected-value>")
     {
-        return AssertSequenceEqual(actual, expected, EqualityComparer<T>.Default.Equals, message, actualExpression, expectedExpression,
+        return AssertSequenceEqual<IEnumerable<T>, T, T>(actual, expected, EqualityComparer<T>.Default.Equals, message, actualExpression, expectedExpression,
             constraintExpression: $"Is.EqualTo({expectedExpression})");
     }
 
     [return: NotNull]
-    public static IEnumerable<T> ShouldBeSequenceEqualTo<T>(
-        [NotNull] this IEnumerable<T>? actual,
-        IEnumerable<T> expected,
-        IEqualityComparer<T> comparer,
+    public static T ShouldBeSequenceEqualTo<T, TItem>(
+        [NotNull] this T? actual,
+        IEnumerable<TItem> expected,
+        IEqualityComparer<TItem> comparer,
         NUnitString message = default,
         [CallerArgumentExpression(nameof(actual))] string actualExpression = "<some-value>",
         [CallerArgumentExpression(nameof(expected))] string expectedExpression = "<expected-value>",
-        [CallerArgumentExpression(nameof(comparer))] string comparerExpression = "<comparer>")
+        [CallerArgumentExpression(nameof(comparer))] string comparerExpression = "<comparer>") where T : IEnumerable<TItem>
     {
         ArgumentNullException.ThrowIfNull(comparer);
 
-        return AssertSequenceEqual(actual, expected, comparer.Equals, message, actualExpression, expectedExpression,
+        return AssertSequenceEqual<T, TItem, TItem>(actual, expected, comparer.Equals, message, actualExpression, expectedExpression,
             constraintExpression: $"Is.EqualTo({expectedExpression}).Using({comparerExpression})");
     }
 
+    [return: NotNull]
+    public static T ShouldBeSequenceEqualTo<T, TActual, TExpected>(
+        [NotNull] this T? actual,
+        IEnumerable<TExpected> expected,
+        Func<TActual, TExpected, bool> itemsAreEqual,
+        NUnitString message = default,
+        [CallerArgumentExpression(nameof(actual))] string actualExpression = "<some-value>",
+        [CallerArgumentExpression(nameof(expected))] string expectedExpression = "<expected-value>",
+        [CallerArgumentExpression(nameof(itemsAreEqual))] string predicateExpression = "<predicate>") where T : IEnumerable<TActual>
+    {
+        return AssertSequenceEqual(actual, expected, itemsAreEqual, message, actualExpression, expectedExpression,
+            constraintExpression: $"Is.EqualTo({expectedExpression}).Using({predicateExpression})");
+    }
+
+    // Fallback for lambdas with implicitly typed parameters: the item type can't be inferred from the constraint of the overload above.
     [return: NotNull]
     public static IEnumerable<TActual> ShouldBeSequenceEqualTo<TActual, TExpected>(
         [NotNull] this IEnumerable<TActual>? actual,
@@ -217,14 +245,14 @@ public static class EnumerableAssertions
             constraintExpression: $"Is.EqualTo({expectedExpression}).Using({predicateExpression})");
     }
 
-    private static IEnumerable<TActual> AssertSequenceEqual<TActual, TExpected>(
-        [NotNull] IEnumerable<TActual>? actual,
+    private static T AssertSequenceEqual<T, TActual, TExpected>(
+        [NotNull] T? actual,
         IEnumerable<TExpected> expected,
         Func<TActual, TExpected, bool> itemsAreEqual,
         NUnitString message,
         string actualExpression,
         string expectedExpression,
-        string constraintExpression)
+        string constraintExpression) where T : IEnumerable<TActual>
     {
         actual.ShouldNotBeNull(valueExpression: actualExpression);
         ArgumentNullException.ThrowIfNull(expected, expectedExpression);

@@ -407,6 +407,25 @@ public class EnumerableAssertionsTests
     }
 
     [Test]
+    public void ShouldBeSequenceEqualTo_ShouldPreserveCollectionType()
+    {
+        var list = new List<int> { 1, 2, 3 };
+
+        List<int> result = list.ShouldBeSequenceEqualTo([1, 2, 3]);
+        result.ShouldBeSameAs(list);
+
+        List<int> emptyList = [];
+        List<int> emptyResult = emptyList.ShouldBeSequenceEqualTo([], EqualityComparer<int>.Default);
+        emptyResult.ShouldBeSameAs(emptyList);
+
+        List<int> resultWithComparer = list.ShouldBeSequenceEqualTo([1, 2, 3], EqualityComparer<int>.Default);
+        resultWithComparer.ShouldBeSameAs(list);
+
+        List<int> resultWithPredicate = list.ShouldBeSequenceEqualTo(["1", "2", "3"], (int a, string e) => a.ToString() == e);
+        resultWithPredicate.ShouldBeSameAs(list);
+    }
+
+    [Test]
     public void ShouldBeSequenceEqualTo_ShouldPassForEmptySequences()
     {
         Enumerable.Empty<int>().ShouldBeSequenceEqualTo([]);
