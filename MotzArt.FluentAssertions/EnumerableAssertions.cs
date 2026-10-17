@@ -89,7 +89,7 @@ public static class EnumerableAssertions
 
         if (enumerator.MoveNext())
         {
-            MessageWriter.Report(message, actualExpression, constraintExpression, "exactly one item", $"more then one matching items < {result}, {enumerator.Current} >");
+            MessageWriter.Report(message, actualExpression, constraintExpression, "exactly one item", $"more than one matching items < {result}, {enumerator.Current} >");
         }
 
         return result;
@@ -115,7 +115,7 @@ public static class EnumerableAssertions
 
         if (enumerator.MoveNext())
         {
-            MessageWriter.Report(message, actualExpression, constraintExpression, "exactly one item", $"more then one matching items < {result}, {enumerator.Current} >");
+            MessageWriter.Report(message, actualExpression, constraintExpression, "exactly one item", $"more than one matching items < {result}, {enumerator.Current} >");
         }
 
         return result;

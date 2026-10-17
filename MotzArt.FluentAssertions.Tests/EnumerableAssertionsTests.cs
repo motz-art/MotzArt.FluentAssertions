@@ -265,7 +265,7 @@ public class EnumerableAssertionsTests
             .Message.ShouldBe($"""
                                  Assert.That({nameof(enumerable)}, Has.Exactly(1).Items)
                                  Expected: exactly one item
-                                 But was:  more then one matching items < 1, 2 >
+                                 But was:  more than one matching items < 1, 2 >
 
                                """);
     }
@@ -321,7 +321,7 @@ public class EnumerableAssertionsTests
             .Message.ShouldBe($"""
                                  Assert.That({nameof(enumerable)}, Has.Exactly(1).Item.Matching(x => x > 1))
                                  Expected: exactly one item
-                                 But was:  more then one matching items < 2, 3 >
+                                 But was:  more than one matching items < 2, 3 >
 
                                """);
     }
