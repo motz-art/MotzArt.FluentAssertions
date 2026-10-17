@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using MotzArt.FluentAssertions.Helpers;
+using NUnit.Framework;
 using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
@@ -172,5 +173,97 @@ public static class EnumerableAssertions
 
                          """);
         }
+    }
+
+    [return: NotNull]
+    public static IEnumerable<T> ShouldBeSequenceEqualTo<T>(
+        [NotNull] this IEnumerable<T>? actual,
+        IEnumerable<T> expected,
+        NUnitString message = default,
+        [CallerArgumentExpression(nameof(actual))] string actualExpression = "<some-value>",
+        [CallerArgumentExpression(nameof(expected))] string expectedExpression = "<expected-value>")
+    {
+        return AssertSequenceEqual(actual, expected, EqualityComparer<T>.Default.Equals, message, actualExpression, expectedExpression,
+            constraintExpression: $"Is.EqualTo({expectedExpression})");
+    }
+
+    [return: NotNull]
+    public static IEnumerable<T> ShouldBeSequenceEqualTo<T>(
+        [NotNull] this IEnumerable<T>? actual,
+        IEnumerable<T> expected,
+        IEqualityComparer<T> comparer,
+        NUnitString message = default,
+        [CallerArgumentExpression(nameof(actual))] string actualExpression = "<some-value>",
+        [CallerArgumentExpression(nameof(expected))] string expectedExpression = "<expected-value>",
+        [CallerArgumentExpression(nameof(comparer))] string comparerExpression = "<comparer>")
+    {
+        ArgumentNullException.ThrowIfNull(comparer);
+
+        return AssertSequenceEqual(actual, expected, comparer.Equals, message, actualExpression, expectedExpression,
+            constraintExpression: $"Is.EqualTo({expectedExpression}).Using({comparerExpression})");
+    }
+
+    [return: NotNull]
+    public static IEnumerable<TActual> ShouldBeSequenceEqualTo<TActual, TExpected>(
+        [NotNull] this IEnumerable<TActual>? actual,
+        IEnumerable<TExpected> expected,
+        Func<TActual, TExpected, bool> itemsAreEqual,
+        NUnitString message = default,
+        [CallerArgumentExpression(nameof(actual))] string actualExpression = "<some-value>",
+        [CallerArgumentExpression(nameof(expected))] string expectedExpression = "<expected-value>",
+        [CallerArgumentExpression(nameof(itemsAreEqual))] string predicateExpression = "<predicate>")
+    {
+        return AssertSequenceEqual(actual, expected, itemsAreEqual, message, actualExpression, expectedExpression,
+            constraintExpression: $"Is.EqualTo({expectedExpression}).Using({predicateExpression})");
+    }
+
+    private static IEnumerable<TActual> AssertSequenceEqual<TActual, TExpected>(
+        [NotNull] IEnumerable<TActual>? actual,
+        IEnumerable<TExpected> expected,
+        Func<TActual, TExpected, bool> itemsAreEqual,
+        NUnitString message,
+        string actualExpression,
+        string expectedExpression,
+        string constraintExpression)
+    {
+        actual.ShouldNotBeNull(valueExpression: actualExpression);
+        ArgumentNullException.ThrowIfNull(expected, expectedExpression);
+        ArgumentNullException.ThrowIfNull(itemsAreEqual);
+
+        var actualItems = actual.ToArray();
+        var expectedItems = expected.ToArray();
+
+        var length = Math.Min(actualItems.Length, expectedItems.Length);
+        var diffIndex = 0;
+
+        while (diffIndex < length && itemsAreEqual(actualItems[diffIndex], expectedItems[diffIndex]))
+        {
+            diffIndex++;
+        }
+
+        if (diffIndex == length && actualItems.Length == expectedItems.Length)
+        {
+            return actual;
+        }
+
+        var writer = new MessageWriter();
+        writer.WriteMessageIfNotEmpty(message);
+        writer.WriteAssertThat(actualExpression, constraintExpression);
+
+        if (actualItems.Length != expectedItems.Length)
+        {
+            writer.Write($"Expected sequence length {expectedItems.Length} but was {actualItems.Length}.");
+        }
+        else
+        {
+            writer.Write($"Sequence lengths are both {expectedItems.Length}.");
+        }
+
+        writer.WriteLine($" Sequences differ at index {diffIndex}.");
+        writer.WriteExpected(((ReadOnlySpan<TExpected>)expectedItems).DescribeValue(skip: diffIndex));
+        writer.WriteActual(((ReadOnlySpan<TActual>)actualItems).DescribeValue(skip: diffIndex));
+
+        writer.ReportFailure();
+        return actual;
     }
 }

@@ -1,4 +1,5 @@
 using static MotzArt.FluentAssertions.Tests.TestHelpers;
+using MotzArt.FluentAssertions.Tests.TestData;
 
 namespace MotzArt.FluentAssertions.Tests;
 
@@ -393,6 +394,132 @@ public class EnumerableAssertionsTests
                                  Assert.That({nameof(enumerable)}, Is.Not.Null)
                                  Expected: not null
                                  But was:  null
+
+                               """);
+    }
+
+    [Test]
+    public void ShouldBeSequenceEqualTo_ShouldPassForEqualSequences()
+    {
+        var enumerable = Enumerable.Range(1, 3);
+        var result = enumerable.ShouldBeSequenceEqualTo([1, 2, 3]);
+        result.ShouldBeSameAs(enumerable);
+    }
+
+    [Test]
+    public void ShouldBeSequenceEqualTo_ShouldPassForEmptySequences()
+    {
+        Enumerable.Empty<int>().ShouldBeSequenceEqualTo([]);
+    }
+
+    [Test]
+    public void ShouldBeSequenceEqualTo_ShouldFailWhenItemsDiffer()
+    {
+        var actual = new[] { 1, 2, 3 };
+        var expected = new[] { 1, 5, 3 };
+        ShouldThrowAssertionException(() => actual.ShouldBeSequenceEqualTo(expected))
+            .Message.ShouldBe($"""
+                                 Assert.That({nameof(actual)}, Is.EqualTo({nameof(expected)}))
+                                 Sequence lengths are both 3. Sequences differ at index 1.
+                                 Expected: [..., 5, 3]
+                                 But was:  [..., 2, 3]
+
+                               """);
+    }
+
+    [Test]
+    public void ShouldBeSequenceEqualTo_ShouldFailWhenActualIsLonger()
+    {
+        var actual = new[] { 1, 2, 3, 4 };
+        var expected = new[] { 1, 2, 3 };
+        ShouldThrowAssertionException(() => actual.ShouldBeSequenceEqualTo(expected))
+            .Message.ShouldBe($"""
+                                 Assert.That({nameof(actual)}, Is.EqualTo({nameof(expected)}))
+                                 Expected sequence length 3 but was 4. Sequences differ at index 3.
+                                 Expected: [...]
+                                 But was:  [..., 4]
+
+                               """);
+    }
+
+    [Test]
+    public void ShouldBeSequenceEqualTo_ShouldFailWhenActualIsShorter()
+    {
+        var actual = new[] { 1, 2 };
+        var expected = new[] { 1, 2, 3 };
+        ShouldThrowAssertionException(() => actual.ShouldBeSequenceEqualTo(expected))
+            .Message.ShouldBe($"""
+                                 Assert.That({nameof(actual)}, Is.EqualTo({nameof(expected)}))
+                                 Expected sequence length 3 but was 2. Sequences differ at index 2.
+                                 Expected: [..., 3]
+                                 But was:  [...]
+
+                               """);
+    }
+
+    [Test]
+    public void ShouldBeSequenceEqualTo_ShouldIncludeCustomMessage()
+    {
+        var actual = new[] { 1 };
+        var expected = new[] { 2 };
+        ShouldThrowAssertionException(() => actual.ShouldBeSequenceEqualTo(expected, "Custom message"))
+            .Message.FirstLine(trim: true).ShouldBe("Custom message");
+    }
+
+    [Test]
+    public void ShouldBeSequenceEqualTo_ShouldFailForNull()
+    {
+        IEnumerable<int>? enumerable = null;
+        ShouldThrowAssertionException(() => enumerable.ShouldBeSequenceEqualTo([1]))
+            .Message.ShouldBe($"""
+                                 Assert.That({nameof(enumerable)}, Is.Not.Null)
+                                 Expected: not null
+                                 But was:  null
+
+                               """);
+    }
+
+    [Test]
+    public void ShouldBeSequenceEqualTo_WithComparer_ShouldPassWhenComparerMatches()
+    {
+        var actual = new[] { new TestClass { Id = 1, Name = "a" }, new TestClass { Id = 2, Name = "b" } };
+        var expected = new[] { new TestClass { Id = 10, Name = "a" }, new TestClass { Id = 20, Name = "b" } };
+        actual.ShouldBeSequenceEqualTo(expected, new TestClassComparerByName());
+    }
+
+    [Test]
+    public void ShouldBeSequenceEqualTo_WithComparer_ShouldFailWhenComparerDoesNotMatch()
+    {
+        var actual = new[] { "a", "b" };
+        var expected = new[] { "A", "C" };
+        ShouldThrowAssertionException(() => actual.ShouldBeSequenceEqualTo(expected, StringComparer.OrdinalIgnoreCase))
+            .Message.ShouldBe($"""
+                                 Assert.That({nameof(actual)}, Is.EqualTo({nameof(expected)}).Using(StringComparer.OrdinalIgnoreCase))
+                                 Sequence lengths are both 2. Sequences differ at index 1.
+                                 Expected: [..., C]
+                                 But was:  [..., b]
+
+                               """);
+    }
+
+    [Test]
+    public void ShouldBeSequenceEqualTo_WithPredicate_ShouldPassForMatchingItems()
+    {
+        var actual = new[] { new TestClass { Id = 1 }, new TestClass { Id = 2 } };
+        actual.ShouldBeSequenceEqualTo([1, 2], (a, e) => a.Id == e);
+    }
+
+    [Test]
+    public void ShouldBeSequenceEqualTo_WithPredicate_ShouldFailForNotMatchingItems()
+    {
+        var actual = new[] { 1, 2, 3 };
+        var expected = new[] { "1", "2", "4" };
+        ShouldThrowAssertionException(() => actual.ShouldBeSequenceEqualTo(expected, (a, e) => a.ToString() == e))
+            .Message.ShouldBe($"""
+                                 Assert.That({nameof(actual)}, Is.EqualTo({nameof(expected)}).Using((a, e) => a.ToString() == e))
+                                 Sequence lengths are both 3. Sequences differ at index 2.
+                                 Expected: [..., 4]
+                                 But was:  [..., 3]
 
                                """);
     }
