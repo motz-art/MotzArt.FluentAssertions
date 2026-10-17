@@ -294,4 +294,107 @@ public static class EnumerableAssertions
         writer.ReportFailure();
         return actual;
     }
+
+    // Each item of one set must be present in the other one and vice versa. Order and duplicates are ignored.
+    // Sets are checked using their own Contains (and so their own comparer), other sequences are converted to HashSet<T> with the default comparer.
+    [return: NotNull]
+    public static T ShouldBeSetEqualTo<T, TItem>(
+        [NotNull] this T? actual,
+        IEnumerable<TItem> expected,
+        NUnitString message = default,
+        [CallerArgumentExpression(nameof(actual))] string actualExpression = "<some-value>",
+        [CallerArgumentExpression(nameof(expected))] string expectedExpression = "<expected-value>") where T : IEnumerable<TItem>
+    {
+        return AssertSetEqual<T, TItem>(actual, expected, comparer: null, message, actualExpression, expectedExpression,
+            constraintExpression: $"Is.SetEqualTo({expectedExpression})");
+    }
+
+    // Fallback for expected values without an item type (e.g. empty collection expression): the item type can't be inferred from the constraint of the overload above.
+    [return: NotNull]
+    public static IEnumerable<T> ShouldBeSetEqualTo<T>(
+        [NotNull] this IEnumerable<T>? actual,
+        IEnumerable<T> expected,
+        NUnitString message = default,
+        [CallerArgumentExpression(nameof(actual))] string actualExpression = "<some-value>",
+        [CallerArgumentExpression(nameof(expected))] string expectedExpression = "<expected-value>")
+    {
+        return AssertSetEqual<IEnumerable<T>, T>(actual, expected, comparer: null, message, actualExpression, expectedExpression,
+            constraintExpression: $"Is.SetEqualTo({expectedExpression})");
+    }
+
+    // The comparer is used for both actual and expected items, overriding comparers of the sets.
+    [return: NotNull]
+    public static T ShouldBeSetEqualTo<T, TItem>(
+        [NotNull] this T? actual,
+        IEnumerable<TItem> expected,
+        IEqualityComparer<TItem> comparer,
+        NUnitString message = default,
+        [CallerArgumentExpression(nameof(actual))] string actualExpression = "<some-value>",
+        [CallerArgumentExpression(nameof(expected))] string expectedExpression = "<expected-value>",
+        [CallerArgumentExpression(nameof(comparer))] string comparerExpression = "<comparer>") where T : IEnumerable<TItem>
+    {
+        ArgumentNullException.ThrowIfNull(comparer);
+
+        return AssertSetEqual<T, TItem>(actual, expected, comparer, message, actualExpression, expectedExpression,
+            constraintExpression: $"Is.SetEqualTo({expectedExpression}).Using({comparerExpression})");
+    }
+
+    private static T AssertSetEqual<T, TItem>(
+        [NotNull] T? actual,
+        IEnumerable<TItem> expected,
+        IEqualityComparer<TItem>? comparer,
+        NUnitString message,
+        string actualExpression,
+        string expectedExpression,
+        string constraintExpression) where T : IEnumerable<TItem>
+    {
+        actual.ShouldNotBeNull(valueExpression: actualExpression);
+        ArgumentNullException.ThrowIfNull(expected, expectedExpression);
+
+        var actualSet = AsSet(actual, comparer);
+        var expectedSet = AsSet(expected, comparer);
+
+        var missingItems = expectedSet.Where(x => !actualSet.Contains(x)).ToArray();
+        var extraItems = actualSet.Where(x => !expectedSet.Contains(x)).ToArray();
+
+        if (missingItems.Length == 0 && extraItems.Length == 0)
+        {
+            return actual;
+        }
+
+        var writer = new MessageWriter();
+        writer.WriteMessageIfNotEmpty(message);
+        writer.WriteAssertThat(actualExpression, constraintExpression);
+
+        if (missingItems.Length > 0)
+        {
+            writer.WriteLine($"Missing items: {DescribeItems(missingItems)}");
+        }
+
+        if (extraItems.Length > 0)
+        {
+            writer.WriteLine($"Extra items: {DescribeItems(extraItems)}");
+        }
+
+        writer.WriteExpected(DescribeItems(expectedSet.ToArray()));
+        writer.WriteActual(DescribeItems(actualSet.ToArray()));
+
+        writer.ReportFailure();
+        return actual;
+    }
+
+    private static IReadOnlySet<TItem> AsSet<TItem>(IEnumerable<TItem> items, IEqualityComparer<TItem>? comparer)
+    {
+        if (comparer == null && items is IReadOnlySet<TItem> set)
+        {
+            return set;
+        }
+
+        return new HashSet<TItem>(items, comparer);
+    }
+
+    private static string DescribeItems<TItem>(TItem[] items)
+    {
+        return items.Length == 0 ? "<empty>" : ((ReadOnlySpan<TItem>)items).DescribeValue();
+    }
 }

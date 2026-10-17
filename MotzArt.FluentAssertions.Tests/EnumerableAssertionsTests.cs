@@ -542,4 +542,139 @@ public class EnumerableAssertionsTests
 
                                """);
     }
+
+    [Test]
+    public void ShouldBeSetEqualTo_ShouldPassForSameItemsInDifferentOrder()
+    {
+        var set = new HashSet<int> { 1, 2, 3 };
+        HashSet<int> result = set.ShouldBeSetEqualTo([3, 1, 2]);
+        result.ShouldBeSameAs(set);
+    }
+
+    [Test]
+    public void ShouldBeSetEqualTo_ShouldIgnoreDuplicatesInExpected()
+    {
+        var set = new HashSet<int> { 1, 2 };
+        set.ShouldBeSetEqualTo([2, 1, 2, 1]);
+    }
+
+    [Test]
+    public void ShouldBeSetEqualTo_ShouldPassForEmptySets()
+    {
+        new HashSet<int>().ShouldBeSetEqualTo([]);
+    }
+
+    [Test]
+    public void ShouldBeSetEqualTo_ShouldUseComparersOfSets()
+    {
+        var actual = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "a", "b" };
+        var expected = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "B", "A" };
+        actual.ShouldBeSetEqualTo(expected);
+    }
+
+    [Test]
+    public void ShouldBeSetEqualTo_ShouldFailWhenItemsAreMissing()
+    {
+        var actual = new HashSet<int> { 1, 2 };
+        var expected = new[] { 1, 2, 3 };
+        ShouldThrowAssertionException(() => actual.ShouldBeSetEqualTo(expected))
+            .Message.ShouldBe($"""
+                                 Assert.That({nameof(actual)}, Is.SetEqualTo({nameof(expected)}))
+                                 Missing items: [3]
+                                 Expected: [1, 2, 3]
+                                 But was:  [1, 2]
+
+                               """);
+    }
+
+    [Test]
+    public void ShouldBeSetEqualTo_ShouldFailWhenThereAreExtraItems()
+    {
+        var actual = new HashSet<int> { 1, 2, 3 };
+        var expected = new[] { 1, 2 };
+        ShouldThrowAssertionException(() => actual.ShouldBeSetEqualTo(expected))
+            .Message.ShouldBe($"""
+                                 Assert.That({nameof(actual)}, Is.SetEqualTo({nameof(expected)}))
+                                 Extra items: [3]
+                                 Expected: [1, 2]
+                                 But was:  [1, 2, 3]
+
+                               """);
+    }
+
+    [Test]
+    public void ShouldBeSetEqualTo_ShouldFailWhenItemsAreMissingAndExtra()
+    {
+        var actual = new HashSet<int> { 1, 2, 4 };
+        var expected = new[] { 1, 2, 3 };
+        ShouldThrowAssertionException(() => actual.ShouldBeSetEqualTo(expected))
+            .Message.ShouldBe($"""
+                                 Assert.That({nameof(actual)}, Is.SetEqualTo({nameof(expected)}))
+                                 Missing items: [3]
+                                 Extra items: [4]
+                                 Expected: [1, 2, 3]
+                                 But was:  [1, 2, 4]
+
+                               """);
+    }
+
+    [Test]
+    public void ShouldBeSetEqualTo_ShouldFailWhenActualIsEmpty()
+    {
+        var actual = new HashSet<int>();
+        var expected = new[] { 1 };
+        ShouldThrowAssertionException(() => actual.ShouldBeSetEqualTo(expected))
+            .Message.ShouldBe($"""
+                                 Assert.That({nameof(actual)}, Is.SetEqualTo({nameof(expected)}))
+                                 Missing items: [1]
+                                 Expected: [1]
+                                 But was:  <empty>
+
+                               """);
+    }
+
+    [Test]
+    public void ShouldBeSetEqualTo_ShouldIncludeCustomMessage()
+    {
+        var actual = new HashSet<int> { 1 };
+        ShouldThrowAssertionException(() => actual.ShouldBeSetEqualTo([2], "Custom message"))
+            .Message.FirstLine(trim: true).ShouldBe("Custom message");
+    }
+
+    [Test]
+    public void ShouldBeSetEqualTo_ShouldFailForNull()
+    {
+        HashSet<int>? set = null;
+        ShouldThrowAssertionException(() => set.ShouldBeSetEqualTo([1]))
+            .Message.ShouldBe($"""
+                                 Assert.That({nameof(set)}, Is.Not.Null)
+                                 Expected: not null
+                                 But was:  null
+
+                               """);
+    }
+
+    [Test]
+    public void ShouldBeSetEqualTo_WithComparer_ShouldPassWhenComparerMatches()
+    {
+        var set = new HashSet<string> { "a", "b" };
+        HashSet<string> result = set.ShouldBeSetEqualTo(["B", "A"], StringComparer.OrdinalIgnoreCase);
+        result.ShouldBeSameAs(set);
+    }
+
+    [Test]
+    public void ShouldBeSetEqualTo_WithComparer_ShouldFailWhenComparerDoesNotMatch()
+    {
+        var actual = new HashSet<string> { "a", "b" };
+        var expected = new[] { "A", "C" };
+        ShouldThrowAssertionException(() => actual.ShouldBeSetEqualTo(expected, StringComparer.OrdinalIgnoreCase))
+            .Message.ShouldBe($"""
+                                 Assert.That({nameof(actual)}, Is.SetEqualTo({nameof(expected)}).Using(StringComparer.OrdinalIgnoreCase))
+                                 Missing items: [C]
+                                 Extra items: [b]
+                                 Expected: [A, C]
+                                 But was:  [a, b]
+
+                               """);
+    }
 }

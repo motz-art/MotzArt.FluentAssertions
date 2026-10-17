@@ -163,6 +163,16 @@ public class EnumerableAssertionsTests
         var ids = new[] { 1, 2 };
         ids.ShouldBeSequenceEqualTo(["1", "2"], (actual, expected) => actual.ToString() == expected);
     }
+
+    [Test]
+    public void ShouldBeSetEqualTo_AssertSameItemsIgnoringOrder()
+    {
+        var numbers = new HashSet<int> { 1, 2, 3 };
+        numbers.ShouldBeSetEqualTo([3, 2, 1]);
+
+        var names = new HashSet<string> { "alice", "bob" };
+        names.ShouldBeSetEqualTo(["Bob", "Alice"], StringComparer.OrdinalIgnoreCase);
+    }
 }
 ```
 
