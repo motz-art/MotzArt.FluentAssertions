@@ -284,6 +284,14 @@ public class EnumerableAssertionsTests
     }
 
     [Test]
+    public void ShouldHaveSingle_WithEnumerable_ShouldIncludeCustomMessage()
+    {
+        var enumerable = Enumerable.Range(1, 10);
+        ShouldThrowAssertionException(() => enumerable.ShouldHaveSingle("Custom message"))
+            .Message.FirstLine(trim: true).ShouldBe("Custom message");
+    }
+
+    [Test]
     public void ShouldHaveSingle_WithPredicate_ShouldPassForArrayWithOneMatchingItem()
     {
         var item = "The Item";
@@ -332,10 +340,19 @@ public class EnumerableAssertionsTests
     }
 
     [Test]
+    public void ShouldHaveSingle_WithPredicate_ShouldIncludeCustomMessage()
+    {
+        var enumerable = Enumerable.Range(1, 10);
+        ShouldThrowAssertionException(() => enumerable.ShouldHaveSingle(x => x > 1, "Custom message"))
+            .Message.FirstLine(trim: true).ShouldBe("Custom message");
+    }
+
+    [Test]
     public void ShouldContain_ShouldPassWhenSequenceHasMatchingItems()
     {
         var array = new[] { 1, 2, 3 };
-        array.ShouldContain(x => x % 2 == 0);
+        var result = array.ShouldContain(x => x % 2 == 0);
+        result.ShouldBeSameAs(array);
     }
 
     [Test]
@@ -365,10 +382,19 @@ public class EnumerableAssertionsTests
     }
 
     [Test]
+    public void ShouldContain_ShouldIncludeCustomMessage()
+    {
+        var enumerable = Enumerable.Empty<int>();
+        ShouldThrowAssertionException(() => enumerable.ShouldContain(x => x > 0, "Custom message"))
+            .Message.FirstLine(trim: true).ShouldBe("Custom message");
+    }
+
+    [Test]
     public void ShouldNotContain_ShouldPassWhenSequenceHasNoMatchingItems()
     {
         var array = new[] { 1, 3, 5 };
-        array.ShouldNotContain(x => x % 2 == 0);
+        var result = array.ShouldNotContain(x => x % 2 == 0);
+        result.ShouldBeSameAs(array);
     }
 
 
@@ -396,6 +422,14 @@ public class EnumerableAssertionsTests
                                  But was:  null
 
                                """);
+    }
+
+    [Test]
+    public void ShouldNotContain_ShouldIncludeCustomMessage()
+    {
+        var enumerable = Enumerable.Range(1, 10);
+        ShouldThrowAssertionException(() => enumerable.ShouldNotContain(x => x > 0, "Custom message"))
+            .Message.FirstLine(trim: true).ShouldBe("Custom message");
     }
 
     [Test]

@@ -73,30 +73,23 @@ public static class EnumerableAssertions
 
     public static T ShouldHaveSingle<T>(
         [NotNull] this IEnumerable<T>? actual,
+        NUnitString message = default,
         [CallerArgumentExpression(nameof(actual))] string actualExpression = "<some-value>")
     {
         using var enumerator = actual.ShouldNotBeNull(valueExpression: actualExpression).GetEnumerator();
 
+        const string constraintExpression = "Has.Exactly(1).Items";
+
         if (!enumerator.MoveNext())
         {
-            Assert.Fail($"""
-                            Assert.That({actualExpression}, Has.Exactly(1).Items)
-                            Expected: exactly one item
-                            But was:  no matching items
-                          
-                          """);
+            MessageWriter.Report(message, actualExpression, constraintExpression, "exactly one item", "no matching items");
         }
 
         var result = enumerator.Current;
 
         if (enumerator.MoveNext())
         {
-            Assert.Fail($"""
-                           Assert.That({actualExpression}, Has.Exactly(1).Items)
-                           Expected: exactly one item
-                           But was:  more then one matching items < {result}, {enumerator.Current} >
-                         
-                         """);
+            MessageWriter.Report(message, actualExpression, constraintExpression, "exactly one item", $"more then one matching items < {result}, {enumerator.Current} >");
         }
 
         return result;
@@ -105,74 +98,61 @@ public static class EnumerableAssertions
     public static T ShouldHaveSingle<T>(
         [NotNull] this IEnumerable<T>? source,
         Func<T, bool> predicate,
+        NUnitString message = default,
         [CallerArgumentExpression(nameof(source))] string actualExpression = "<some-value>",
         [CallerArgumentExpression(nameof(predicate))] string predicateExpression = "<predicate-not-specified>")
     {
         using var enumerator = source.ShouldNotBeNull(valueExpression: actualExpression).Where(predicate).GetEnumerator();
 
+        var constraintExpression = $"Has.Exactly(1).Item.Matching({predicateExpression})";
+
         if (!enumerator.MoveNext())
         {
-            Assert.Fail($"""
-                           Assert.That({actualExpression}, Has.Exactly(1).Item.Matching({predicateExpression}))
-                           Expected: exactly one item
-                           But was:  no matching items
-
-                         """);
+            MessageWriter.Report(message, actualExpression, constraintExpression, "exactly one item", "no matching items");
         }
 
         var result = enumerator.Current;
 
         if (enumerator.MoveNext())
         {
-            Assert.Fail($"""
-                           Assert.That({actualExpression}, Has.Exactly(1).Item.Matching({predicateExpression}))
-                           Expected: exactly one item
-                           But was:  more then one matching items < {result}, {enumerator.Current} >
-
-                         """);
+            MessageWriter.Report(message, actualExpression, constraintExpression, "exactly one item", $"more then one matching items < {result}, {enumerator.Current} >");
         }
 
         return result;
     }
 
-    public static void ShouldContain<T>([NotNull] this IEnumerable<T>? actual,
+    [return: NotNull]
+    public static IEnumerable<T> ShouldContain<T>(
+        [NotNull] this IEnumerable<T>? actual,
         Func<T, bool> predicate,
-        [CallerArgumentExpression(nameof(actual))]
-        string actualExpression = "<some-value>",
-        [CallerArgumentExpression(nameof(predicate))]
-        string predicateExpression = "<predicate-not-specified>")
+        NUnitString message = default,
+        [CallerArgumentExpression(nameof(actual))] string actualExpression = "<some-value>",
+        [CallerArgumentExpression(nameof(predicate))] string predicateExpression = "<predicate-not-specified>")
     {
-        using var enumerator = actual.ShouldNotBeNull(valueExpression: actualExpression).Where(predicate).GetEnumerator();
-
-        if (!enumerator.MoveNext())
+        if (!actual.ShouldNotBeNull(valueExpression: actualExpression).Any(predicate))
         {
-            Assert.Fail($"""
-                           Assert.That({actualExpression}, Has.Items.Matching({predicateExpression}))
-                           Expected: has matching items
-                           But was:  no matching items
-
-                         """);
+            MessageWriter.Report(message, actualExpression, $"Has.Items.Matching({predicateExpression})", "has matching items", "no matching items");
         }
+
+        return actual;
     }
 
-    public static void ShouldNotContain<T>([NotNull] this IEnumerable<T>? actual,
+    [return: NotNull]
+    public static IEnumerable<T> ShouldNotContain<T>(
+        [NotNull] this IEnumerable<T>? actual,
         Func<T, bool> predicate,
-        [CallerArgumentExpression(nameof(actual))]
-        string actualExpression = "<some-value>",
-        [CallerArgumentExpression(nameof(predicate))]
-        string predicateExpression = "<predicate-not-specified>")
+        NUnitString message = default,
+        [CallerArgumentExpression(nameof(actual))] string actualExpression = "<some-value>",
+        [CallerArgumentExpression(nameof(predicate))] string predicateExpression = "<predicate-not-specified>")
     {
         using var enumerator = actual.ShouldNotBeNull(valueExpression: actualExpression).Where(predicate).GetEnumerator();
 
         if (enumerator.MoveNext())
         {
-            Assert.Fail($"""
-                           Assert.That({actualExpression}, Has.No.Items.Matching({predicateExpression}))
-                           Expected: has no matching items
-                           But was:  matching item < {enumerator.Current} >
-
-                         """);
+            MessageWriter.Report(message, actualExpression, $"Has.No.Items.Matching({predicateExpression})", "has no matching items", $"matching item < {enumerator.Current} >");
         }
+
+        return actual;
     }
 
     [return: NotNull]
