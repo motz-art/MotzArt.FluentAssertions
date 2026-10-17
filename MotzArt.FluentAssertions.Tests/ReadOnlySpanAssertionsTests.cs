@@ -92,7 +92,79 @@ public class ReadOnlySpanAssertionsTests
                                Span lengths are both 3. Spans differ at index 2.
                                Expected: [..., 4]
                                But was:  [..., 3]
-                             
+
+                             """);
+    }
+
+    [Test]
+    public void ShouldBe_WithReadOnlySpanAndComparer_PassWhenComparerMatches()
+    {
+        var span1 = new ReadOnlySpan<string>(["a", "b"]);
+        var span2 = new ReadOnlySpan<string>(["A", "B"]);
+
+        span1.ShouldBe(span2, StringComparer.OrdinalIgnoreCase);
+    }
+
+    [Test]
+    public void ShouldBe_WithReadOnlySpanAndComparer_FailWhenComparerDoesNotMatch()
+    {
+        TestHelpers.ShouldThrowAssertionException(() =>
+        {
+            var span1 = new ReadOnlySpan<string>(["a", "b"]);
+            var span2 = new ReadOnlySpan<string>(["A", "C"]);
+
+            span1.ShouldBe(span2, StringComparer.OrdinalIgnoreCase);
+        }).Message.ShouldBe($"""
+                               Assert.That(span1, Is.EqualTo(span2).Using(StringComparer.OrdinalIgnoreCase))
+                               Span lengths are both 2. Spans differ at index 1.
+                               Expected: [..., C]
+                               But was:  [..., b]
+
+                             """);
+    }
+
+    [Test]
+    public void ShouldBe_WithReadOnlySpanAndComparer_FailWhenSpansHasDifferentLength()
+    {
+        TestHelpers.ShouldThrowAssertionException(() =>
+        {
+            var span1 = new ReadOnlySpan<string>(["a"]);
+            var span2 = new ReadOnlySpan<string>(["A", "B"]);
+
+            span1.ShouldBe(span2, StringComparer.OrdinalIgnoreCase);
+        }).Message.ShouldBe($"""
+                               Assert.That(span1, Is.EqualTo(span2).Using(StringComparer.OrdinalIgnoreCase))
+                               Expected span length 2 but was 1. Spans differ at index 1.
+                               Expected: [..., B]
+                               But was:  [...]
+
+                             """);
+    }
+
+    [Test]
+    public void ShouldBe_WithReadOnlySpanAndPredicate_PassForMatchingItems()
+    {
+        var span1 = new ReadOnlySpan<int>([1, 2]);
+        var span2 = new ReadOnlySpan<string>(["1", "2"]);
+
+        span1.ShouldBe(span2, (a, e) => a.ToString() == e);
+    }
+
+    [Test]
+    public void ShouldBe_WithReadOnlySpanAndPredicate_FailForNotMatchingItems()
+    {
+        TestHelpers.ShouldThrowAssertionException(() =>
+        {
+            var span1 = new ReadOnlySpan<int>([1, 2, 3]);
+            var span2 = new ReadOnlySpan<string>(["1", "2", "4"]);
+
+            span1.ShouldBe(span2, (a, e) => a.ToString() == e);
+        }).Message.ShouldBe($"""
+                               Assert.That(span1, Is.EqualTo(span2).Using((a, e) => a.ToString() == e))
+                               Span lengths are both 3. Spans differ at index 2.
+                               Expected: [..., 4]
+                               But was:  [..., 3]
+
                              """);
     }
 }

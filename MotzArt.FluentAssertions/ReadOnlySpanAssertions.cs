@@ -39,43 +39,78 @@ public static class ReadOnlySpanAssertions
         NUnitString message = default,
         [CallerArgumentExpression(nameof(actual))] string actualExpression = "<some-value>", [CallerArgumentExpression(nameof(expected))] string otherExpression = "<ReadOnlySpan>")
     {
-        if (!actual.SequenceEqual(expected))
+        return AssertSequenceEqual(actual, expected, EqualityComparer<T>.Default.Equals, message, actualExpression,
+            constraintExpression: $"Is.EqualTo({otherExpression})");
+    }
+
+    public static ReadOnlySpan<T> ShouldBe<T>(this ReadOnlySpan<T> actual, ReadOnlySpan<T> expected,
+        IEqualityComparer<T> comparer,
+        NUnitString message = default,
+        [CallerArgumentExpression(nameof(actual))] string actualExpression = "<some-value>",
+        [CallerArgumentExpression(nameof(expected))] string otherExpression = "<ReadOnlySpan>",
+        [CallerArgumentExpression(nameof(comparer))] string comparerExpression = "<comparer>")
+    {
+        ArgumentNullException.ThrowIfNull(comparer);
+
+        return AssertSequenceEqual(actual, expected, comparer.Equals, message, actualExpression,
+            constraintExpression: $"Is.EqualTo({otherExpression}).Using({comparerExpression})");
+    }
+
+    public static ReadOnlySpan<TActual> ShouldBe<TActual, TExpected>(this ReadOnlySpan<TActual> actual, ReadOnlySpan<TExpected> expected,
+        Func<TActual, TExpected, bool> itemsAreEqual,
+        NUnitString message = default,
+        [CallerArgumentExpression(nameof(actual))] string actualExpression = "<some-value>",
+        [CallerArgumentExpression(nameof(expected))] string otherExpression = "<ReadOnlySpan>",
+        [CallerArgumentExpression(nameof(itemsAreEqual))] string predicateExpression = "<predicate>")
+    {
+        return AssertSequenceEqual(actual, expected, itemsAreEqual, message, actualExpression,
+            constraintExpression: $"Is.EqualTo({otherExpression}).Using({predicateExpression})");
+    }
+
+    private static ReadOnlySpan<TActual> AssertSequenceEqual<TActual, TExpected>(ReadOnlySpan<TActual> actual, ReadOnlySpan<TExpected> expected,
+        Func<TActual, TExpected, bool> itemsAreEqual,
+        NUnitString message,
+        string actualExpression,
+        string constraintExpression)
+    {
+        ArgumentNullException.ThrowIfNull(itemsAreEqual);
+
+        var diffIndex = FindDiffIndex(actual, expected, itemsAreEqual);
+
+        if (diffIndex == actual.Length && actual.Length == expected.Length)
         {
-            var writer = new MessageWriter();
-            writer.WriteMessageIfNotEmpty(message);
-
-            writer.WriteAssertThat(actualExpression, $"Is.EqualTo({otherExpression})");
-
-            if (actual.Length != expected.Length)
-            {
-                writer.Write($"Expected span length {expected.Length} but was {actual.Length}.");
-            }
-            else
-            {
-                writer.Write($"Span lengths are both {expected.Length}.");
-            }
-
-            var diffIndex = FindDiffIndex(actual, expected);
-
-            writer.WriteLine($" Spans differ at index {diffIndex}.");
-            writer.WriteExpected(expected.DescribeValue(skip: diffIndex));
-            writer.WriteActual(actual.DescribeValue(skip: diffIndex));
-
-            writer.ReportFailure();
+            return actual;
         }
 
+        var writer = new MessageWriter();
+        writer.WriteMessageIfNotEmpty(message);
+
+        writer.WriteAssertThat(actualExpression, constraintExpression);
+
+        if (actual.Length != expected.Length)
+        {
+            writer.Write($"Expected span length {expected.Length} but was {actual.Length}.");
+        }
+        else
+        {
+            writer.Write($"Span lengths are both {expected.Length}.");
+        }
+
+        writer.WriteLine($" Spans differ at index {diffIndex}.");
+        writer.WriteExpected(expected.DescribeValue(skip: diffIndex));
+        writer.WriteActual(actual.DescribeValue(skip: diffIndex));
+
+        writer.ReportFailure();
         return actual;
     }
 
-    private static int FindDiffIndex<T>(ReadOnlySpan<T> a, ReadOnlySpan<T> b)
+    private static int FindDiffIndex<TActual, TExpected>(ReadOnlySpan<TActual> a, ReadOnlySpan<TExpected> b, Func<TActual, TExpected, bool> itemsAreEqual)
     {
-        var comparer = EqualityComparer<T>.Default;
-
         var length = Math.Min(a.Length, b.Length);
 
         for (int i = 0; i < length; i++)
         {
-            if (!comparer.Equals(a[i], b[i]))
+            if (!itemsAreEqual(a[i], b[i]))
             {
                 return i;
             }

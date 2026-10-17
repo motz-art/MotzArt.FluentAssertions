@@ -60,4 +60,17 @@ public class EnumerableAssertionsTests
         var numbers = new List<int> { 1, 2, 3 };
         numbers.ShouldNotContain(x => x > 10);
     }
+
+    [Test]
+    public void ShouldBeSequenceEqualTo_AssertItemByItem()
+    {
+        var numbers = new List<int> { 1, 2, 3 };
+        numbers.ShouldBeSequenceEqualTo([1, 2, 3]);
+
+        var names = new[] { "alice", "bob" };
+        names.ShouldBeSequenceEqualTo(["Alice", "Bob"], StringComparer.OrdinalIgnoreCase);
+
+        var ids = new[] { 1, 2 };
+        ids.ShouldBeSequenceEqualTo(["1", "2"], (actual, expected) => actual.ToString() == expected);
+    }
 }

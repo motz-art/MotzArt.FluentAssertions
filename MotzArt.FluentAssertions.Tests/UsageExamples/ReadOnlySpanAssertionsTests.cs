@@ -24,4 +24,14 @@ public class ReadOnlySpanAssertionsTests
         ReadOnlySpan<int> expected = [1, 2, 3];
         actual.ShouldBe(expected);
     }
+
+    [Test]
+    public void CompareSpansItemByItem()
+    {
+        ReadOnlySpan<string> names = ["alice", "bob"];
+        names.ShouldBe(["Alice", "Bob"], StringComparer.OrdinalIgnoreCase);
+
+        ReadOnlySpan<int> ids = [1, 2];
+        ids.ShouldBe(["1", "2"], (actual, expected) => actual.ToString() == expected);
+    }
 }
