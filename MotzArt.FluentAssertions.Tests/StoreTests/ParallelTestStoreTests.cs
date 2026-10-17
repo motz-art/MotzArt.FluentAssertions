@@ -1,0 +1,51 @@
+namespace MotzArt.FluentAssertions.Tests.StoreTests
+{
+    [TestFixture]
+    [Parallelizable(ParallelScope.All)]
+    public class ParallelTestStoreTests
+    {
+        private const string FixtureKey = "ParallelFixtureKey";
+        private const string FixtureValue = $"Value From {nameof(ParallelTestStoreTests)}";
+        private const string TestKey = "ParallelTestKey";
+
+        private static readonly CountdownEvent AllTestsStarted = new(TestCount);
+
+        private const int TestCount = 8;
+
+        public static IEnumerable<int> TestIndexes => Enumerable.Range(0, TestCount);
+
+        [OneTimeSetUp]
+        public void OneTimeSetUp()
+        {
+            TestStore.Set(FixtureKey, FixtureValue);
+        }
+
+        [OneTimeTearDown]
+        public void OneTimeTearDown()
+        {
+            TestStore.TryGet(FixtureKey, out string value).ShouldBeTrue();
+            value.ShouldBe(FixtureValue);
+            TestStore.TryGet(TestKey, out string _).ShouldBeFalse();
+        }
+
+        [Test]
+        [TestCaseSource(nameof(TestIndexes))]
+        public void ValuesAreIsolatedBetweenParallelTests(int index)
+        {
+            var value = $"Value {index}";
+
+            TestStore.TryGet(TestKey, out string _).ShouldBeFalse();
+            TestStore.Set(TestKey, value);
+
+            // Wait for other tests to set their values, so they run concurrently.
+            AllTestsStarted.Signal();
+            AllTestsStarted.Wait(TimeSpan.FromSeconds(5));
+
+            TestStore.TryGet(TestKey, out string storedValue).ShouldBeTrue();
+            storedValue.ShouldBe(value);
+
+            TestStore.TryGet(FixtureKey, out string fixtureValue).ShouldBeTrue();
+            fixtureValue.ShouldBe(FixtureValue);
+        }
+    }
+}
