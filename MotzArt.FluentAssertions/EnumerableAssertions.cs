@@ -3,6 +3,7 @@ using NUnit.Framework;
 using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
+using static MotzArt.FluentAssertions.Helpers.MessageUtils;
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
 namespace MotzArt.FluentAssertions;
@@ -150,6 +151,124 @@ public static class EnumerableAssertions
         if (enumerator.MoveNext())
         {
             MessageWriter.Report(message, actualExpression, $"Has.No.Items.Matching({predicateExpression})", "has no matching items", $"matching item < {enumerator.Current} >");
+        }
+
+        return actual;
+    }
+
+    [return: NotNull]
+    public static T ShouldContain<T, TItem>(
+        [NotNull] this T? actual,
+        TItem expected,
+        NUnitString message = default,
+        [CallerArgumentExpression(nameof(actual))] string actualExpression = "<some-value>",
+        [CallerArgumentExpression(nameof(expected))] string expectedExpression = "<expected-value>") where T : IEnumerable<TItem>
+    {
+        return AssertContains(actual, expected, EqualityComparer<TItem>.Default, message, actualExpression,
+            constraintExpression: $"Has.Member({expectedExpression})");
+    }
+
+    [return: NotNull]
+    public static IEnumerable<T> ShouldContain<T>(
+        [NotNull] this IEnumerable<T>? actual,
+        T expected,
+        NUnitString message = default,
+        [CallerArgumentExpression(nameof(actual))] string actualExpression = "<some-value>",
+        [CallerArgumentExpression(nameof(expected))] string expectedExpression = "<expected-value>")
+    {
+        return AssertContains(actual, expected, EqualityComparer<T>.Default, message, actualExpression,
+            constraintExpression: $"Has.Member({expectedExpression})");
+    }
+
+    [return: NotNull]
+    public static T ShouldContain<T, TItem>(
+        [NotNull] this T? actual,
+        TItem expected,
+        IEqualityComparer<TItem> comparer,
+        NUnitString message = default,
+        [CallerArgumentExpression(nameof(actual))] string actualExpression = "<some-value>",
+        [CallerArgumentExpression(nameof(expected))] string expectedExpression = "<expected-value>",
+        [CallerArgumentExpression(nameof(comparer))] string comparerExpression = "<comparer>") where T : IEnumerable<TItem>
+    {
+        ArgumentNullException.ThrowIfNull(comparer);
+
+        return AssertContains(actual, expected, comparer, message, actualExpression,
+            constraintExpression: $"Has.Member({expectedExpression}).Using({comparerExpression})");
+    }
+
+    [return: NotNull]
+    public static T ShouldNotContain<T, TItem>(
+        [NotNull] this T? actual,
+        TItem unexpected,
+        NUnitString message = default,
+        [CallerArgumentExpression(nameof(actual))] string actualExpression = "<some-value>",
+        [CallerArgumentExpression(nameof(unexpected))] string unexpectedExpression = "<unexpected-value>") where T : IEnumerable<TItem>
+    {
+        return AssertDoesNotContain(actual, unexpected, EqualityComparer<TItem>.Default, message, actualExpression,
+            constraintExpression: $"Has.No.Member({unexpectedExpression})");
+    }
+
+    [return: NotNull]
+    public static IEnumerable<T> ShouldNotContain<T>(
+        [NotNull] this IEnumerable<T>? actual,
+        T unexpected,
+        NUnitString message = default,
+        [CallerArgumentExpression(nameof(actual))] string actualExpression = "<some-value>",
+        [CallerArgumentExpression(nameof(unexpected))] string unexpectedExpression = "<unexpected-value>")
+    {
+        return AssertDoesNotContain(actual, unexpected, EqualityComparer<T>.Default, message, actualExpression,
+            constraintExpression: $"Has.No.Member({unexpectedExpression})");
+    }
+
+    [return: NotNull]
+    public static T ShouldNotContain<T, TItem>(
+        [NotNull] this T? actual,
+        TItem unexpected,
+        IEqualityComparer<TItem> comparer,
+        NUnitString message = default,
+        [CallerArgumentExpression(nameof(actual))] string actualExpression = "<some-value>",
+        [CallerArgumentExpression(nameof(unexpected))] string unexpectedExpression = "<unexpected-value>",
+        [CallerArgumentExpression(nameof(comparer))] string comparerExpression = "<comparer>") where T : IEnumerable<TItem>
+    {
+        ArgumentNullException.ThrowIfNull(comparer);
+
+        return AssertDoesNotContain(actual, unexpected, comparer, message, actualExpression,
+            constraintExpression: $"Has.No.Member({unexpectedExpression}).Using({comparerExpression})");
+    }
+
+    private static T AssertContains<T, TItem>(
+        [NotNull] T? actual,
+        TItem expected,
+        IEqualityComparer<TItem> comparer,
+        NUnitString message,
+        string actualExpression,
+        string constraintExpression) where T : IEnumerable<TItem>
+    {
+        var actualItems = actual.ShouldNotBeNull(valueExpression: actualExpression).ToArray();
+
+        if (!actualItems.Contains(expected, comparer))
+        {
+            MessageWriter.Report(message, actualExpression, constraintExpression,
+                $"collection containing {expected.DescribeValue()}", DescribeItems(actualItems));
+        }
+
+        return actual;
+    }
+
+    private static T AssertDoesNotContain<T, TItem>(
+        [NotNull] T? actual,
+        TItem unexpected,
+        IEqualityComparer<TItem> comparer,
+        NUnitString message,
+        string actualExpression,
+        string constraintExpression) where T : IEnumerable<TItem>
+    {
+        var actualItems = actual.ShouldNotBeNull(valueExpression: actualExpression).ToArray();
+
+        if (actualItems.Contains(unexpected, comparer))
+        {
+            MessageWriter.Report(message, actualExpression, constraintExpression,
+                $"collection not containing {unexpected.DescribeValue()}", DescribeItems(actualItems));
         }
 
         return actual;
@@ -371,10 +490,5 @@ public static class EnumerableAssertions
         }
 
         return new HashSet<TItem>(items, comparer);
-    }
-
-    private static string DescribeItems<TItem>(TItem[] items)
-    {
-        return items.Length == 0 ? "<empty>" : ((ReadOnlySpan<TItem>)items).DescribeValue();
     }
 }

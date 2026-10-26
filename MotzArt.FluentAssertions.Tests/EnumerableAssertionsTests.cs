@@ -433,6 +433,151 @@ public class EnumerableAssertionsTests
     }
 
     [Test]
+    public void ShouldContainItem_ShouldPassAndReturnSourceWhenItemIsPresent()
+    {
+        var list = new List<int> { 1, 2, 3 };
+        List<int> result = list.ShouldContain(2);
+        result.ShouldBeSameAs(list);
+    }
+
+    [Test]
+    public void ShouldContainItem_ShouldPassForItemOfBaseType()
+    {
+        var items = new List<object> { 1, "two" };
+        items.ShouldContain("two");
+    }
+
+    [Test]
+    public void ShouldContainItem_ShouldFailWhenItemIsMissing()
+    {
+        var list = new List<int> { 1, 2, 3 };
+        ShouldThrowAssertionException(() => list.ShouldContain(4))
+            .Message.ShouldBe($"""
+                                 Assert.That({nameof(list)}, Has.Member(4))
+                                 Expected: collection containing 4
+                                 But was:  [1, 2, 3]
+
+                               """);
+    }
+
+    [Test]
+    public void ShouldContainItem_ShouldFailForEmptyCollection()
+    {
+        var array = Array.Empty<int>();
+        ShouldThrowAssertionException(() => array.ShouldContain(1))
+            .Message.ShouldBe($"""
+                                 Assert.That({nameof(array)}, Has.Member(1))
+                                 Expected: collection containing 1
+                                 But was:  <empty>
+
+                               """);
+    }
+
+    [Test]
+    public void ShouldContainItem_ShouldFailForNull()
+    {
+        int[]? array = null;
+        ShouldThrowAssertionException(() => array.ShouldContain(1))
+            .Message.ShouldBe($"""
+                                 Assert.That({nameof(array)}, Is.Not.Null)
+                                 Expected: not null
+                                 But was:  null
+
+                               """);
+    }
+
+    [Test]
+    public void ShouldContainItem_ShouldIncludeCustomMessage()
+    {
+        var array = new[] { 1, 2, 3 };
+        ShouldThrowAssertionException(() => array.ShouldContain(4, "Custom message"))
+            .Message.FirstLine(trim: true).ShouldBe("Custom message");
+    }
+
+    [Test]
+    public void ShouldContainItem_WithComparer_ShouldPassWhenComparerFindsItem()
+    {
+        var names = new[] { "alice", "bob" };
+        var result = names.ShouldContain("BOB", StringComparer.OrdinalIgnoreCase);
+        result.ShouldBeSameAs(names);
+    }
+
+    [Test]
+    public void ShouldContainItem_WithComparer_ShouldFailWhenComparerFindsNoItem()
+    {
+        var names = new[] { "alice", "bob" };
+        ShouldThrowAssertionException(() => names.ShouldContain("BOB", StringComparer.Ordinal))
+            .Message.ShouldBe($"""
+                                 Assert.That({nameof(names)}, Has.Member("BOB").Using(StringComparer.Ordinal))
+                                 Expected: collection containing BOB
+                                 But was:  [alice, bob]
+
+                               """);
+    }
+
+    [Test]
+    public void ShouldNotContainItem_ShouldPassAndReturnSourceWhenItemIsAbsent()
+    {
+        var list = new List<int> { 1, 2, 3 };
+        List<int> result = list.ShouldNotContain(4);
+        result.ShouldBeSameAs(list);
+    }
+
+    [Test]
+    public void ShouldNotContainItem_ShouldFailWhenItemIsPresent()
+    {
+        var list = new List<int> { 1, 2, 3 };
+        ShouldThrowAssertionException(() => list.ShouldNotContain(2))
+            .Message.ShouldBe($"""
+                                 Assert.That({nameof(list)}, Has.No.Member(2))
+                                 Expected: collection not containing 2
+                                 But was:  [1, 2, 3]
+
+                               """);
+    }
+
+    [Test]
+    public void ShouldNotContainItem_ShouldFailForNull()
+    {
+        int[]? array = null;
+        ShouldThrowAssertionException(() => array.ShouldNotContain(1))
+            .Message.ShouldBe($"""
+                                 Assert.That({nameof(array)}, Is.Not.Null)
+                                 Expected: not null
+                                 But was:  null
+
+                               """);
+    }
+
+    [Test]
+    public void ShouldNotContainItem_ShouldIncludeCustomMessage()
+    {
+        var array = new[] { 1, 2, 3 };
+        ShouldThrowAssertionException(() => array.ShouldNotContain(1, "Custom message"))
+            .Message.FirstLine(trim: true).ShouldBe("Custom message");
+    }
+
+    [Test]
+    public void ShouldNotContainItem_WithComparer_ShouldFailWhenComparerFindsItem()
+    {
+        var names = new[] { "alice", "bob" };
+        ShouldThrowAssertionException(() => names.ShouldNotContain("BOB", StringComparer.OrdinalIgnoreCase))
+            .Message.ShouldBe($"""
+                                 Assert.That({nameof(names)}, Has.No.Member("BOB").Using(StringComparer.OrdinalIgnoreCase))
+                                 Expected: collection not containing BOB
+                                 But was:  [alice, bob]
+
+                               """);
+    }
+
+    [Test]
+    public void ShouldNotContainItem_WithComparer_ShouldPassWhenComparerFindsNoItem()
+    {
+        var names = new[] { "alice", "bob" };
+        names.ShouldNotContain("BOB", StringComparer.Ordinal);
+    }
+
+    [Test]
     public void ShouldBeSequenceEqualTo_ShouldPassForEqualSequences()
     {
         var enumerable = Enumerable.Range(1, 3);

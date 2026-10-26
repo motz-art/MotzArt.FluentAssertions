@@ -152,6 +152,23 @@ public class EnumerableAssertionsTests
     }
 
     [Test]
+    public void ShouldContainItem_AssertHasSpecificItem()
+    {
+        var numbers = new List<int> { 1, 2, 3 };
+        numbers.ShouldContain(2);
+
+        var names = new[] { "Alice", "Bob" };
+        names.ShouldContain("bob", StringComparer.OrdinalIgnoreCase);
+    }
+
+    [Test]
+    public void ShouldNotContainItem_AssertHasNoSpecificItem()
+    {
+        var numbers = new List<int> { 1, 2, 3 };
+        numbers.ShouldNotContain(4);
+    }
+
+    [Test]
     public void ShouldBeSequenceEqualTo_AssertItemByItem()
     {
         var numbers = new List<int> { 1, 2, 3 };
