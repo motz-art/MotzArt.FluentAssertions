@@ -5,14 +5,26 @@ using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using static MotzArt.FluentAssertions.Helpers.MessageUtils;
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
 namespace MotzArt.FluentAssertions;
 
+/// <summary>
+/// Assertions for collections and other sequences.
+/// </summary>
+/// <remarks>
+/// Unless stated otherwise, assertions fail for a <see langword="null"/> sequence.
+/// Most overloads return the asserted collection with its own type (for example <see cref="List{T}"/>)
+/// for chaining. When the item type can't be inferred, e.g. for an empty collection expression or a lambda with implicitly typed parameters,
+/// the overload that returns <see cref="IEnumerable{T}"/> is used instead.
+/// </remarks>
 public static class EnumerableAssertions
 {
     private const int MaxReportedItemFailures = 10;
 
+    /// <summary>
+    /// Asserts that <paramref name="actual"/> has no items.
+    /// </summary>
+    /// <returns>The asserted sequence, for chaining further assertions.</returns>
     [return: NotNull]
     public static T ShouldBeEmpty<T>(
         [NotNull] this T? actual,
@@ -24,6 +36,10 @@ public static class EnumerableAssertions
         return actual;
     }
 
+    /// <summary>
+    /// Asserts that <paramref name="actual"/> is <see langword="null"/> or has no items.
+    /// </summary>
+    /// <returns>The asserted sequence, for chaining further assertions.</returns>
     [return: NotNullIfNotNull(nameof(actual))]
     public static T? ShouldBeNullOrEmpty<T>(
         this T? actual,
@@ -34,6 +50,10 @@ public static class EnumerableAssertions
         return actual;
     }
 
+    /// <summary>
+    /// Asserts that <paramref name="actual"/> has at least one item.
+    /// </summary>
+    /// <returns>The asserted sequence, for chaining further assertions.</returns>
     [return: NotNull]
     public static T ShouldNotBeNullOrEmpty<T>(
         [NotNull] this T? actual,
@@ -43,6 +63,10 @@ public static class EnumerableAssertions
         return ShouldNotBeEmpty(actual, message, actualExpression);
     }
 
+    /// <summary>
+    /// Asserts that <paramref name="source"/> has at least one item.
+    /// </summary>
+    /// <returns>The asserted sequence, for chaining further assertions.</returns>
     [return: NotNull]
     public static T ShouldNotBeEmpty<T>(
         [NotNull] this T? source,
@@ -53,6 +77,10 @@ public static class EnumerableAssertions
         return source ?? throw new InvalidOperationException("UPS. This should not happen because of assert above.");
     }
 
+    /// <summary>
+    /// Asserts that <paramref name="actual"/> has exactly <paramref name="count"/> items.
+    /// </summary>
+    /// <returns>The asserted sequence, for chaining further assertions.</returns>
     [return: NotNull]
     public static T ShouldHaveCount<T>(
         [NotNull] this T? actual,
@@ -65,6 +93,10 @@ public static class EnumerableAssertions
         return actual;
     }
 
+    /// <summary>
+    /// Asserts that <paramref name="source"/> has exactly one item.
+    /// </summary>
+    /// <returns>The single item, for chaining assertions on it.</returns>
     public static T ShouldHaveSingle<T>([NotNull] this IReadOnlyList<T>? source,
         NUnitString message = default,
         [CallerArgumentExpression(nameof(source))]
@@ -75,6 +107,10 @@ public static class EnumerableAssertions
         return source[0];
     }
 
+    /// <summary>
+    /// Asserts that <paramref name="actual"/> has exactly one item.
+    /// </summary>
+    /// <returns>The single item, for chaining assertions on it.</returns>
     public static T ShouldHaveSingle<T>(
         [NotNull] this IEnumerable<T>? actual,
         NUnitString message = default,
@@ -99,6 +135,10 @@ public static class EnumerableAssertions
         return result;
     }
 
+    /// <summary>
+    /// Asserts that exactly one item of <paramref name="source"/> matches <paramref name="predicate"/>.
+    /// </summary>
+    /// <returns>The single matching item, for chaining assertions on it.</returns>
     public static T ShouldHaveSingle<T>(
         [NotNull] this IEnumerable<T>? source,
         Func<T, bool> predicate,
@@ -125,6 +165,10 @@ public static class EnumerableAssertions
         return result;
     }
 
+    /// <summary>
+    /// Asserts that at least one item of <paramref name="actual"/> matches <paramref name="predicate"/>.
+    /// </summary>
+    /// <returns>The asserted sequence, for chaining further assertions.</returns>
     [return: NotNull]
     public static IEnumerable<T> ShouldContain<T>(
         [NotNull] this IEnumerable<T>? actual,
@@ -141,6 +185,10 @@ public static class EnumerableAssertions
         return actual;
     }
 
+    /// <summary>
+    /// Asserts that no item of <paramref name="actual"/> matches <paramref name="predicate"/>.
+    /// </summary>
+    /// <returns>The asserted sequence, for chaining further assertions.</returns>
     [return: NotNull]
     public static IEnumerable<T> ShouldNotContain<T>(
         [NotNull] this IEnumerable<T>? actual,
@@ -159,6 +207,10 @@ public static class EnumerableAssertions
         return actual;
     }
 
+    /// <summary>
+    /// Asserts that <paramref name="actual"/> contains an item equal to <paramref name="expected"/>.
+    /// </summary>
+    /// <returns>The asserted collection, for chaining further assertions.</returns>
     [return: NotNull]
     public static T ShouldContain<T, TItem>(
         [NotNull] this T? actual,
@@ -171,6 +223,10 @@ public static class EnumerableAssertions
             constraintExpression: $"Has.Member({expectedExpression})");
     }
 
+    /// <summary>
+    /// Asserts that <paramref name="actual"/> contains an item equal to <paramref name="expected"/>.
+    /// </summary>
+    /// <returns>The asserted sequence, for chaining further assertions.</returns>
     [return: NotNull]
     public static IEnumerable<T> ShouldContain<T>(
         [NotNull] this IEnumerable<T>? actual,
@@ -183,6 +239,10 @@ public static class EnumerableAssertions
             constraintExpression: $"Has.Member({expectedExpression})");
     }
 
+    /// <summary>
+    /// Asserts that <paramref name="actual"/> contains an item equal to <paramref name="expected"/> according to <paramref name="comparer"/>.
+    /// </summary>
+    /// <returns>The asserted collection, for chaining further assertions.</returns>
     [return: NotNull]
     public static T ShouldContain<T, TItem>(
         [NotNull] this T? actual,
@@ -199,6 +259,10 @@ public static class EnumerableAssertions
             constraintExpression: $"Has.Member({expectedExpression}).Using({comparerExpression})");
     }
 
+    /// <summary>
+    /// Asserts that <paramref name="actual"/> doesn't contain an item equal to <paramref name="unexpected"/>.
+    /// </summary>
+    /// <returns>The asserted collection, for chaining further assertions.</returns>
     [return: NotNull]
     public static T ShouldNotContain<T, TItem>(
         [NotNull] this T? actual,
@@ -211,6 +275,10 @@ public static class EnumerableAssertions
             constraintExpression: $"Has.No.Member({unexpectedExpression})");
     }
 
+    /// <summary>
+    /// Asserts that <paramref name="actual"/> doesn't contain an item equal to <paramref name="unexpected"/>.
+    /// </summary>
+    /// <returns>The asserted sequence, for chaining further assertions.</returns>
     [return: NotNull]
     public static IEnumerable<T> ShouldNotContain<T>(
         [NotNull] this IEnumerable<T>? actual,
@@ -223,6 +291,10 @@ public static class EnumerableAssertions
             constraintExpression: $"Has.No.Member({unexpectedExpression})");
     }
 
+    /// <summary>
+    /// Asserts that <paramref name="actual"/> doesn't contain an item equal to <paramref name="unexpected"/> according to <paramref name="comparer"/>.
+    /// </summary>
+    /// <returns>The asserted collection, for chaining further assertions.</returns>
     [return: NotNull]
     public static T ShouldNotContain<T, TItem>(
         [NotNull] this T? actual,
@@ -277,6 +349,14 @@ public static class EnumerableAssertions
         return actual;
     }
 
+    /// <summary>
+    /// Runs <paramref name="assertion"/> for every item of <paramref name="actual"/> and asserts that it passes for all of them.
+    /// </summary>
+    /// <remarks>
+    /// Every item is checked, even after a failure. The failure message lists each failing item with its index and the message
+    /// of its failed assertion (or the exception it threw), up to 10 items.
+    /// </remarks>
+    /// <returns>The asserted collection, for chaining further assertions.</returns>
     [return: NotNull]
     public static T ShouldAllSatisfy<T, TItem>(
         [NotNull] this T? actual,
@@ -288,6 +368,14 @@ public static class EnumerableAssertions
         return AssertAllSatisfy<T, TItem>(actual, assertion, message, actualExpression, assertionExpression);
     }
 
+    /// <summary>
+    /// Runs <paramref name="assertion"/> for every item of <paramref name="actual"/> and asserts that it passes for all of them.
+    /// </summary>
+    /// <remarks>
+    /// Every item is checked, even after a failure. The failure message lists each failing item with its index and the message
+    /// of its failed assertion (or the exception it threw), up to 10 items.
+    /// </remarks>
+    /// <returns>The asserted sequence, for chaining further assertions.</returns>
     [return: NotNull]
     public static IEnumerable<T> ShouldAllSatisfy<T>(
         [NotNull] this IEnumerable<T>? actual,
@@ -394,6 +482,14 @@ public static class EnumerableAssertions
 
     private readonly record struct ItemFailure<TItem>(int Index, TItem Item, string Message);
 
+    /// <summary>
+    /// Asserts that <paramref name="actual"/> has the same items as <paramref name="expected"/> in the same order,
+    /// comparing items with <see cref="EqualityComparer{T}.Default"/>.
+    /// </summary>
+    /// <remarks>
+    /// The failure message shows both lengths and the items from the first differing index.
+    /// </remarks>
+    /// <returns>The asserted collection, for chaining further assertions.</returns>
     [return: NotNull]
     public static T ShouldBeSequenceEqualTo<T, TItem>(
         [NotNull] this T? actual,
@@ -406,7 +502,14 @@ public static class EnumerableAssertions
             constraintExpression: $"Is.EqualTo({expectedExpression})");
     }
 
-    // Fallback for expected values without an item type (e.g. empty collection expression): the item type can't be inferred from the constraint of the overload above.
+    /// <summary>
+    /// Asserts that <paramref name="actual"/> has the same items as <paramref name="expected"/> in the same order,
+    /// comparing items with <see cref="EqualityComparer{T}.Default"/>.
+    /// </summary>
+    /// <remarks>
+    /// The failure message shows both lengths and the items from the first differing index.
+    /// </remarks>
+    /// <returns>The asserted sequence, for chaining further assertions.</returns>
     [return: NotNull]
     public static IEnumerable<T> ShouldBeSequenceEqualTo<T>(
         [NotNull] this IEnumerable<T>? actual,
@@ -419,6 +522,14 @@ public static class EnumerableAssertions
             constraintExpression: $"Is.EqualTo({expectedExpression})");
     }
 
+    /// <summary>
+    /// Asserts that <paramref name="actual"/> has the same items as <paramref name="expected"/> in the same order,
+    /// comparing items with <paramref name="comparer"/>.
+    /// </summary>
+    /// <remarks>
+    /// The failure message shows both lengths and the items from the first differing index.
+    /// </remarks>
+    /// <returns>The asserted collection, for chaining further assertions.</returns>
     [return: NotNull]
     public static T ShouldBeSequenceEqualTo<T, TItem>(
         [NotNull] this T? actual,
@@ -435,6 +546,14 @@ public static class EnumerableAssertions
             constraintExpression: $"Is.EqualTo({expectedExpression}).Using({comparerExpression})");
     }
 
+    /// <summary>
+    /// Asserts that <paramref name="actual"/> has as many items as <paramref name="expected"/> and that
+    /// <paramref name="itemsAreEqual"/> returns <see langword="true"/> for each pair of items at the same index.
+    /// </summary>
+    /// <remarks>
+    /// The failure message shows both lengths and the items from the first differing index.
+    /// </remarks>
+    /// <returns>The asserted collection, for chaining further assertions.</returns>
     [return: NotNull]
     public static T ShouldBeSequenceEqualTo<T, TActual, TExpected>(
         [NotNull] this T? actual,
@@ -449,7 +568,14 @@ public static class EnumerableAssertions
             constraintExpression: $"Is.EqualTo({expectedExpression}).Using({predicateExpression})");
     }
 
-    // Fallback for lambdas with implicitly typed parameters: the item type can't be inferred from the constraint of the overload above.
+    /// <summary>
+    /// Asserts that <paramref name="actual"/> has as many items as <paramref name="expected"/> and that
+    /// <paramref name="itemsAreEqual"/> returns <see langword="true"/> for each pair of items at the same index.
+    /// </summary>
+    /// <remarks>
+    /// The failure message shows both lengths and the items from the first differing index.
+    /// </remarks>
+    /// <returns>The asserted sequence, for chaining further assertions.</returns>
     [return: NotNull]
     public static IEnumerable<TActual> ShouldBeSequenceEqualTo<TActual, TExpected>(
         [NotNull] this IEnumerable<TActual>? actual,
@@ -514,8 +640,14 @@ public static class EnumerableAssertions
         return actual;
     }
 
-    // Each item of one set must be present in the other one and vice versa. Order and duplicates are ignored.
-    // Sets are checked using their own Contains (and so their own comparer), other sequences are converted to HashSet<T> with the default comparer.
+    /// <summary>
+    /// Asserts that every item of <paramref name="actual"/> is in <paramref name="expected"/> and vice versa, ignoring order and duplicates.
+    /// </summary>
+    /// <remarks>
+    /// Sets are checked with their own comparer; other sequences use <see cref="EqualityComparer{T}.Default"/>.
+    /// The failure message lists the missing and the extra items.
+    /// </remarks>
+    /// <returns>The asserted collection, for chaining further assertions.</returns>
     [return: NotNull]
     public static T ShouldBeSetEqualTo<T, TItem>(
         [NotNull] this T? actual,
@@ -528,7 +660,14 @@ public static class EnumerableAssertions
             constraintExpression: $"Is.SetEqualTo({expectedExpression})");
     }
 
-    // Fallback for expected values without an item type (e.g. empty collection expression): the item type can't be inferred from the constraint of the overload above.
+    /// <summary>
+    /// Asserts that every item of <paramref name="actual"/> is in <paramref name="expected"/> and vice versa, ignoring order and duplicates.
+    /// </summary>
+    /// <remarks>
+    /// Sets are checked with their own comparer; other sequences use <see cref="EqualityComparer{T}.Default"/>.
+    /// The failure message lists the missing and the extra items.
+    /// </remarks>
+    /// <returns>The asserted sequence, for chaining further assertions.</returns>
     [return: NotNull]
     public static IEnumerable<T> ShouldBeSetEqualTo<T>(
         [NotNull] this IEnumerable<T>? actual,
@@ -541,7 +680,15 @@ public static class EnumerableAssertions
             constraintExpression: $"Is.SetEqualTo({expectedExpression})");
     }
 
-    // The comparer is used for both actual and expected items, overriding comparers of the sets.
+    /// <summary>
+    /// Asserts that every item of <paramref name="actual"/> is in <paramref name="expected"/> and vice versa, ignoring order and duplicates,
+    /// comparing items with <paramref name="comparer"/>.
+    /// </summary>
+    /// <remarks>
+    /// <paramref name="comparer"/> is used for both sides, even when they are sets with their own comparers.
+    /// The failure message lists the missing and the extra items.
+    /// </remarks>
+    /// <returns>The asserted collection, for chaining further assertions.</returns>
     [return: NotNull]
     public static T ShouldBeSetEqualTo<T, TItem>(
         [NotNull] this T? actual,
