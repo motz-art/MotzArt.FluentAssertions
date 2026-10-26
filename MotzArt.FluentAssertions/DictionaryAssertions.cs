@@ -3,12 +3,18 @@ using NUnit.Framework;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using static MotzArt.FluentAssertions.Helpers.MessageUtils;
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
 namespace MotzArt.FluentAssertions;
 
+/// <summary>
+/// Assertions for the keys and values of <see cref="IReadOnlyDictionary{TKey, TValue}"/> instances.
+/// </summary>
 public static class DictionaryAssertions
 {
+    /// <summary>
+    /// Asserts that <paramref name="actual"/> isn't <see langword="null"/> and contains <paramref name="key"/>.
+    /// </summary>
+    /// <returns>The value of <paramref name="key"/>, for chaining assertions on it.</returns>
     public static TValue ShouldContainKey<TKey, TValue>(
         [NotNull] this IReadOnlyDictionary<TKey, TValue>? actual,
         TKey key,
@@ -27,6 +33,10 @@ public static class DictionaryAssertions
         return value;
     }
 
+    /// <summary>
+    /// Asserts that <paramref name="actual"/> isn't <see langword="null"/> and doesn't contain <paramref name="key"/>.
+    /// </summary>
+    /// <returns>The asserted dictionary, for chaining further assertions.</returns>
     [return: NotNull]
     public static IReadOnlyDictionary<TKey, TValue> ShouldNotContainKey<TKey, TValue>(
         [NotNull] this IReadOnlyDictionary<TKey, TValue>? actual,
@@ -46,6 +56,10 @@ public static class DictionaryAssertions
         return actual;
     }
 
+    /// <summary>
+    /// Asserts that <paramref name="actual"/> isn't <see langword="null"/> and contains <paramref name="value"/> under any key.
+    /// </summary>
+    /// <returns>The asserted dictionary, for chaining further assertions.</returns>
     [return: NotNull]
     public static IReadOnlyDictionary<TKey, TValue> ShouldContainValue<TKey, TValue>(
         [NotNull] this IReadOnlyDictionary<TKey, TValue>? actual,
@@ -65,6 +79,10 @@ public static class DictionaryAssertions
         return actual;
     }
 
+    /// <summary>
+    /// Asserts that <paramref name="actual"/> isn't <see langword="null"/> and doesn't contain <paramref name="value"/> under any key.
+    /// </summary>
+    /// <returns>The asserted dictionary, for chaining further assertions.</returns>
     [return: NotNull]
     public static IReadOnlyDictionary<TKey, TValue> ShouldNotContainValue<TKey, TValue>(
         [NotNull] this IReadOnlyDictionary<TKey, TValue>? actual,
