@@ -10,7 +10,7 @@ Write expressive, readable test code with detailed failure messages that pinpoin
 - **Nullabile ready** - Library is designed with nullabile static analysis in mind
 - **Detailed diagnostics** - Failure messages show expected vs. actual with helpful context
 - **Caller expression tracking** - Error messages display the code that was asserted
-- **Multiple assertion domains** - Common, enumerable, dictionary, string, numeric, boolean, exception, and span assertions
+- **Multiple assertion domains** - Common, enumerable, dictionary, string, numeric, date and time, boolean, exception, and span assertions
 - **NUnit integration** - Seamless integration with NUnit testing framework
 
 ## Installation
@@ -467,6 +467,37 @@ public class NumberAssertionsTests
     {
         double value = 10.0;
         value.ShouldBeLessThanOrEqual(10);
+    }
+}
+```
+
+
+### DateTime Assertions
+
+Assert order and closeness of `DateTime` and `DateTimeOffset` values:
+
+``` C#
+[TestFixture]
+public class DateTimeAssertionsTests
+{
+    [Test]
+    public void ShouldBeBeforeAndAfter_AssertOrderOfDates()
+    {
+        var orderedAt = new DateTime(2025, 3, 1, 10, 0, 0);
+        var shippedAt = new DateTime(2025, 3, 2, 8, 30, 0);
+
+        shippedAt
+            .ShouldBeAfter(orderedAt)
+            .ShouldBeOnOrBefore(orderedAt.AddDays(1));
+
+        orderedAt.ShouldBeBefore(shippedAt);
+    }
+
+    [Test]
+    public void ShouldBeCloseTo_AssertDateWithinTolerance()
+    {
+        var createdAt = DateTimeOffset.UtcNow;
+        createdAt.ShouldBeCloseTo(DateTimeOffset.UtcNow, TimeSpan.FromSeconds(5));
     }
 }
 ```
