@@ -3,12 +3,23 @@ using NUnit.Framework;
 using NUnit.Framework.Internal;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
 namespace MotzArt.FluentAssertions;
 
+/// <summary>
+/// Assertions for code that should or shouldn't throw exceptions.
+/// </summary>
+/// <remarks>
+/// The overloads that take <see cref="TestDelegate"/> or <see cref="AsyncTestDelegate"/> are meant to be called with
+/// <c>using static MotzArt.FluentAssertions.ThrowAssertions;</c>, e.g. <c>ShouldThrow&lt;ArgumentException&gt;(() => Parse(null));</c>.
+/// The extension overloads take a delegate stored in a variable.
+/// </remarks>
 public static class ThrowAssertions
 {
+    /// <summary>
+    /// Asserts that <paramref name="code"/> throws <typeparamref name="TException"/> or an exception derived from it.
+    /// </summary>
+    /// <returns>The thrown exception, for chaining assertions on it.</returns>
     public static TException ShouldThrow<TException>(
         this Action code,
         NUnitString message = default,
@@ -17,6 +28,10 @@ public static class ThrowAssertions
         return ShouldThrow<TException>((TestDelegate)(() => code()), message, codeExpression);
     }
 
+    /// <summary>
+    /// Asserts that <paramref name="code"/> throws <typeparamref name="TException"/> or an exception derived from it.
+    /// </summary>
+    /// <returns>The thrown exception, for chaining assertions on it.</returns>
     public static TException ShouldThrow<TException>(
         TestDelegate code,
         NUnitString message = default,
@@ -39,16 +54,30 @@ public static class ThrowAssertions
         throw CreateNoExceptionThrownException<TException>(message, codeExpression);
     }
 
+    /// <summary>
+    /// Asserts that <paramref name="code"/> throws exactly <typeparamref name="TException"/> with the message <paramref name="exceptionMessage"/>.
+    /// </summary>
     public static void ShouldThrowWithMessage<TException>(this Action code, string exceptionMessage, NUnitString message = default, [CallerArgumentExpression(nameof(code))] string codeExpression = "") where TException : Exception
     {
         Assert.That(code, Throws.TypeOf<TException>().With.Message.EqualTo(exceptionMessage), message, actualExpression: codeExpression);
     }
 
+    /// <summary>
+    /// Asserts that the task returned by <paramref name="code"/> throws <typeparamref name="TException"/> or an exception derived from it.
+    /// </summary>
+    /// <returns>The thrown exception, for chaining assertions on it.</returns>
     public static Task<TException> ShouldThrowAsync<TException>(this Func<Task> code, NUnitString message = default, [CallerArgumentExpression(nameof(code))] string codeExpression = "") where TException : Exception
     {
         return ShouldThrowAsync<TException>((AsyncTestDelegate)(() => code()), message, codeExpression);
     }
 
+    /// <summary>
+    /// Asserts that the task returned by <paramref name="code"/> throws <typeparamref name="TException"/> or an exception derived from it.
+    /// </summary>
+    /// <remarks>
+    /// An <see cref="AggregateException"/> with a single <typeparamref name="TException"/> inside is unwrapped.
+    /// </remarks>
+    /// <returns>The thrown exception, for chaining assertions on it.</returns>
     public static async Task<TException> ShouldThrowAsync<TException>(AsyncTestDelegate code, NUnitString message = default, [CallerArgumentExpression(nameof(code))] string codeExpression = "") where TException : Exception
     {
         using var ctx = new TestExecutionContext.IsolatedContext();
@@ -77,11 +106,23 @@ public static class ThrowAssertions
         throw CreateNoExceptionThrownException<TException>(message, codeExpression);
     }
 
+    /// <summary>
+    /// Asserts that <paramref name="code"/> doesn't throw any exception.
+    /// </summary>
+    /// <remarks>
+    /// The failure message shows the thrown exception, which is also kept as the inner exception of the failure.
+    /// </remarks>
     public static void ShouldNotThrow(this Action code, NUnitString message = default, [CallerArgumentExpression(nameof(code))] string codeExpression = "")
     {
         ShouldNotThrow((TestDelegate)(() => code()), message, codeExpression);
     }
 
+    /// <summary>
+    /// Asserts that <paramref name="code"/> doesn't throw any exception.
+    /// </summary>
+    /// <remarks>
+    /// The failure message shows the thrown exception, which is also kept as the inner exception of the failure.
+    /// </remarks>
     public static void ShouldNotThrow(TestDelegate code, NUnitString message = default, [CallerArgumentExpression(nameof(code))] string codeExpression = "")
     {
         using var ctx = new TestExecutionContext.IsolatedContext();
@@ -96,6 +137,13 @@ public static class ThrowAssertions
         }
     }
 
+    /// <summary>
+    /// Asserts that <paramref name="code"/> doesn't throw any exception.
+    /// </summary>
+    /// <remarks>
+    /// The failure message shows the thrown exception, which is also kept as the inner exception of the failure.
+    /// </remarks>
+    /// <returns>The result of <paramref name="code"/>, for chaining assertions on it.</returns>
     public static T ShouldNotThrow<T>(this Func<T> code, NUnitString message = default, [CallerArgumentExpression(nameof(code))] string codeExpression = "")
     {
         using var ctx = new TestExecutionContext.IsolatedContext();
@@ -110,11 +158,23 @@ public static class ThrowAssertions
         }
     }
 
+    /// <summary>
+    /// Asserts that <paramref name="code"/> and the task it returns don't throw any exception.
+    /// </summary>
+    /// <remarks>
+    /// The failure message shows the thrown exception, which is also kept as the inner exception of the failure.
+    /// </remarks>
     public static Task ShouldNotThrowAsync(this Func<Task> code, NUnitString message = default, [CallerArgumentExpression(nameof(code))] string codeExpression = "")
     {
         return ShouldNotThrowAsync((AsyncTestDelegate)(() => code()), message, codeExpression);
     }
 
+    /// <summary>
+    /// Asserts that <paramref name="code"/> and the task it returns don't throw any exception.
+    /// </summary>
+    /// <remarks>
+    /// The failure message shows the thrown exception, which is also kept as the inner exception of the failure.
+    /// </remarks>
     public static async Task ShouldNotThrowAsync(AsyncTestDelegate code, NUnitString message = default, [CallerArgumentExpression(nameof(code))] string codeExpression = "")
     {
         using var ctx = new TestExecutionContext.IsolatedContext();
@@ -129,6 +189,13 @@ public static class ThrowAssertions
         }
     }
 
+    /// <summary>
+    /// Asserts that <paramref name="code"/> and the task it returns don't throw any exception.
+    /// </summary>
+    /// <remarks>
+    /// The failure message shows the thrown exception, which is also kept as the inner exception of the failure.
+    /// </remarks>
+    /// <returns>The result of the task, for chaining assertions on it.</returns>
     public static async Task<T> ShouldNotThrowAsync<T>(this Func<Task<T>> code, NUnitString message = default, [CallerArgumentExpression(nameof(code))] string codeExpression = "")
     {
         using var ctx = new TestExecutionContext.IsolatedContext();
