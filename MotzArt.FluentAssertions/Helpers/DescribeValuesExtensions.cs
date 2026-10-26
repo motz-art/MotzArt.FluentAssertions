@@ -3,14 +3,20 @@ using System.Globalization;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
 namespace MotzArt.FluentAssertions.Helpers;
 
+/// <summary>
+/// Formats values, types and strings the way they are shown in failure messages.
+/// </summary>
 public static class DescribeValuesExtensions
 {
     private static IFormatProvider FormatProvider => CultureInfo.InvariantCulture;
 
+    /// <summary>
+    /// Describes the items of <paramref name="span"/> starting at <paramref name="skip"/>, e.g. <c>[1, 2, 3]</c>,
+    /// or <c>[..., 2, 3]</c> when items are skipped. The description is cut after about <paramref name="maxLength"/> characters.
+    /// </summary>
     public static string DescribeValue<T>(this ReadOnlySpan<T> span, int skip = 0, int maxLength = 250)
     {
         if (span.Length == 0) return $"empty <ReadOnlySpan<{typeof(T).DescribeType()}>>";
@@ -42,6 +48,10 @@ public static class DescribeValuesExtensions
         return sb.ToString();
     }
 
+    /// <summary>
+    /// Describes <paramref name="value"/>: strings as they are, characters as C# literals, numbers in invariant culture with
+    /// their C# suffix, values with their own <see cref="object.ToString"/> by it, and other values as JSON.
+    /// </summary>
     public static string DescribeValue<T>(this T? value)
     {
         if (value == null)
@@ -89,6 +99,9 @@ public static class DescribeValuesExtensions
         }
     }
 
+    /// <summary>
+    /// Describes <paramref name="type"/> as in C# source, e.g. <c>List&lt;int&gt;</c>, <c>int?</c> or <c>string[]</c>.
+    /// </summary>
     public static string DescribeType(this Type type)
     {
         if (type.IsNullable(out var baseType)) return baseType.DescribeType() + "?";
@@ -136,6 +149,9 @@ public static class DescribeValuesExtensions
         return toStringOverload.DeclaringType != typeof(object);
     }
 
+    /// <summary>
+    /// Formats <paramref name="value"/> as a quoted string with escaped quotes and backslashes, or as <c>null</c>.
+    /// </summary>
     public static string FormatValue(string? value)
     {
         if (value == null)
@@ -149,6 +165,9 @@ public static class DescribeValuesExtensions
             return sb.ToString();
         }
     }
+    /// <summary>
+    /// Appends <paramref name="value"/> to <paramref name="sb"/> as a quoted string with escaped quotes and backslashes, or as <c>null</c>.
+    /// </summary>
     public static void WriteValue(this StringBuilder sb, string? value)
     {
         if (value == null)
@@ -161,6 +180,10 @@ public static class DescribeValuesExtensions
         }
     }
 
+    /// <summary>
+    /// Appends the item of <paramref name="span"/> at index <paramref name="item"/> to <paramref name="sb"/>,
+    /// with <c>...</c> in place of the items before and after it.
+    /// </summary>
     public static void ShowAtItem<T>(this StringBuilder sb, ReadOnlySpan<T> span, int item)
     {
         if (item >= span.Length)
