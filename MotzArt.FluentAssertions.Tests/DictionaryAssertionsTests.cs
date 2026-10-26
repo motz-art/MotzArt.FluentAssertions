@@ -1,0 +1,134 @@
+using static MotzArt.FluentAssertions.Tests.TestHelpers;
+
+namespace MotzArt.FluentAssertions.Tests;
+
+[TestFixture]
+public class DictionaryAssertionsTests
+{
+    private readonly Dictionary<string, int> ages = new() { ["Alice"] = 30, ["Bob"] = 25 };
+
+    [Test]
+    public void ShouldContainKey_ShouldReturnValueOfKey()
+    {
+        ages.ShouldContainKey("Bob").ShouldBe(25);
+    }
+
+    [Test]
+    public void ShouldContainKey_ShouldFailWhenKeyIsMissing()
+    {
+        ShouldThrowAssertionException(() => ages.ShouldContainKey("Carol"))
+            .Message.ShouldBe($"""
+                                 Assert.That({nameof(ages)}, Does.ContainKey("Carol"))
+                                 Expected: dictionary containing key Carol
+                                 But was:  keys [Alice, Bob]
+
+                               """);
+    }
+
+    [Test]
+    public void ShouldContainKey_ShouldFailForEmptyDictionary()
+    {
+        var empty = new Dictionary<string, int>();
+        ShouldThrowAssertionException(() => empty.ShouldContainKey("Carol"))
+            .Message.ShouldBe($"""
+                                 Assert.That({nameof(empty)}, Does.ContainKey("Carol"))
+                                 Expected: dictionary containing key Carol
+                                 But was:  keys <empty>
+
+                               """);
+    }
+
+    [Test]
+    public void ShouldContainKey_ShouldFailForNull()
+    {
+        Dictionary<string, int>? dictionary = null;
+        ShouldThrowAssertionException(() => dictionary.ShouldContainKey("Carol"))
+            .Message.ShouldBe($"""
+                                 Assert.That({nameof(dictionary)}, Is.Not.Null)
+                                 Expected: not null
+                                 But was:  null
+
+                               """);
+    }
+
+    [Test]
+    public void ShouldContainKey_ShouldIncludeCustomMessage()
+    {
+        ShouldThrowAssertionException(() => ages.ShouldContainKey("Carol", "Custom message"))
+            .Message.FirstLine(trim: true).ShouldBe("Custom message");
+    }
+
+    [Test]
+    public void ShouldNotContainKey_ShouldPassAndReturnSourceWhenKeyIsMissing()
+    {
+        ages.ShouldNotContainKey("Carol").ShouldBeSameAs(ages);
+    }
+
+    [Test]
+    public void ShouldNotContainKey_ShouldFailWhenKeyIsPresent()
+    {
+        ShouldThrowAssertionException(() => ages.ShouldNotContainKey("Alice"))
+            .Message.ShouldBe($"""
+                                 Assert.That({nameof(ages)}, Does.Not.ContainKey("Alice"))
+                                 Expected: dictionary not containing key Alice
+                                 But was:  keys [Alice, Bob]
+
+                               """);
+    }
+
+    [Test]
+    public void ShouldNotContainKey_ShouldFailForNull()
+    {
+        Dictionary<string, int>? dictionary = null;
+        ShouldThrowAssertionException(() => dictionary.ShouldNotContainKey("Carol"))
+            .Message.ShouldBe($"""
+                                 Assert.That({nameof(dictionary)}, Is.Not.Null)
+                                 Expected: not null
+                                 But was:  null
+
+                               """);
+    }
+
+    [Test]
+    public void ShouldContainValue_ShouldPassAndReturnSourceWhenValueIsPresent()
+    {
+        ages.ShouldContainValue(30).ShouldBeSameAs(ages);
+    }
+
+    [Test]
+    public void ShouldContainValue_ShouldFailWhenValueIsMissing()
+    {
+        ShouldThrowAssertionException(() => ages.ShouldContainValue(40))
+            .Message.ShouldBe($"""
+                                 Assert.That({nameof(ages)}, Does.ContainValue(40))
+                                 Expected: dictionary containing value 40
+                                 But was:  values [30, 25]
+
+                               """);
+    }
+
+    [Test]
+    public void ShouldContainValue_ShouldIncludeCustomMessage()
+    {
+        ShouldThrowAssertionException(() => ages.ShouldContainValue(40, "Custom message"))
+            .Message.FirstLine(trim: true).ShouldBe("Custom message");
+    }
+
+    [Test]
+    public void ShouldNotContainValue_ShouldPassAndReturnSourceWhenValueIsMissing()
+    {
+        ages.ShouldNotContainValue(40).ShouldBeSameAs(ages);
+    }
+
+    [Test]
+    public void ShouldNotContainValue_ShouldFailWhenValueIsPresent()
+    {
+        ShouldThrowAssertionException(() => ages.ShouldNotContainValue(30))
+            .Message.ShouldBe($"""
+                                 Assert.That({nameof(ages)}, Does.Not.ContainValue(30))
+                                 Expected: dictionary not containing value 30
+                                 But was:  values [30, 25]
+
+                               """);
+    }
+}

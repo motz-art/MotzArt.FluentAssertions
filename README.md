@@ -10,7 +10,7 @@ Write expressive, readable test code with detailed failure messages that pinpoin
 - **Nullabile ready** - Library is designed with nullabile static analysis in mind
 - **Detailed diagnostics** - Failure messages show expected vs. actual with helpful context
 - **Caller expression tracking** - Error messages display the code that was asserted
-- **Multiple assertion domains** - Common, enumerable, string, numeric, boolean, exception, and span assertions
+- **Multiple assertion domains** - Common, enumerable, dictionary, string, numeric, boolean, exception, and span assertions
 - **NUnit integration** - Seamless integration with NUnit testing framework
 
 ## Installation
@@ -200,6 +200,41 @@ public class EnumerableAssertionsTests
 
         var names = new HashSet<string> { "alice", "bob" };
         names.ShouldBeSetEqualTo(["Bob", "Alice"], StringComparer.OrdinalIgnoreCase);
+    }
+}
+```
+
+
+### Dictionary Assertions
+
+Assert dictionary keys and values:
+
+``` C#
+[TestFixture]
+public class DictionaryAssertionsTests
+{
+    [Test]
+    public void ShouldContainKey_AssertKeyAndCheckItsValue()
+    {
+        var ages = new Dictionary<string, int> { ["Alice"] = 30, ["Bob"] = 25 };
+        // Returns the value of the key
+        ages.ShouldContainKey("Alice").ShouldBe(30);
+    }
+
+    [Test]
+    public void ShouldNotContainKey_AssertKeyIsMissing()
+    {
+        var ages = new Dictionary<string, int> { ["Alice"] = 30 };
+        ages.ShouldNotContainKey("Bob");
+    }
+
+    [Test]
+    public void ShouldContainValue_AssertValueIsPresent()
+    {
+        var ages = new Dictionary<string, int> { ["Alice"] = 30, ["Bob"] = 25 };
+        ages
+            .ShouldContainValue(25)
+            .ShouldNotContainValue(40);
     }
 }
 ```
