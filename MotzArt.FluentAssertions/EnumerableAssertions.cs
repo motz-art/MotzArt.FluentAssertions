@@ -1,5 +1,6 @@
 ﻿using MotzArt.FluentAssertions.Helpers;
 using NUnit.Framework;
+using NUnit.Framework.Internal;
 using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
@@ -10,6 +11,8 @@ namespace MotzArt.FluentAssertions;
 
 public static class EnumerableAssertions
 {
+    private const int MaxReportedItemFailures = 10;
+
     [return: NotNull]
     public static T ShouldBeEmpty<T>(
         [NotNull] this T? actual,
@@ -273,6 +276,123 @@ public static class EnumerableAssertions
 
         return actual;
     }
+
+    [return: NotNull]
+    public static T ShouldAllSatisfy<T, TItem>(
+        [NotNull] this T? actual,
+        Action<TItem> assertion,
+        NUnitString message = default,
+        [CallerArgumentExpression(nameof(actual))] string actualExpression = "<some-value>",
+        [CallerArgumentExpression(nameof(assertion))] string assertionExpression = "<assertion>") where T : IEnumerable<TItem>
+    {
+        return AssertAllSatisfy<T, TItem>(actual, assertion, message, actualExpression, assertionExpression);
+    }
+
+    [return: NotNull]
+    public static IEnumerable<T> ShouldAllSatisfy<T>(
+        [NotNull] this IEnumerable<T>? actual,
+        Action<T> assertion,
+        NUnitString message = default,
+        [CallerArgumentExpression(nameof(actual))] string actualExpression = "<some-value>",
+        [CallerArgumentExpression(nameof(assertion))] string assertionExpression = "<assertion>")
+    {
+        return AssertAllSatisfy<IEnumerable<T>, T>(actual, assertion, message, actualExpression, assertionExpression);
+    }
+
+    private static T AssertAllSatisfy<T, TItem>(
+        [NotNull] T? actual,
+        Action<TItem> assertion,
+        NUnitString message,
+        string actualExpression,
+        string assertionExpression) where T : IEnumerable<TItem>
+    {
+        actual.ShouldNotBeNull(valueExpression: actualExpression);
+        ArgumentNullException.ThrowIfNull(assertion);
+
+        var actualItems = actual.ToArray();
+        var failures = FindItemFailures(actualItems, assertion);
+
+        if (failures.Length > 0)
+        {
+            ReportItemFailures(failures, actualItems.Length, message, actualExpression, $"Has.All.Satisfying({assertionExpression})");
+        }
+
+        return actual;
+    }
+
+    private static ItemFailure<TItem>[] FindItemFailures<TItem>(TItem[] items, Action<TItem> assertion)
+    {
+        var failures = new List<ItemFailure<TItem>>();
+
+        for (var index = 0; index < items.Length; index++)
+        {
+            var failureMessage = GetAssertionFailureMessage(assertion, items[index]);
+
+            if (failureMessage != null)
+            {
+                failures.Add(new ItemFailure<TItem>(index, items[index], failureMessage));
+            }
+        }
+
+        return failures.ToArray();
+    }
+
+    private static string? GetAssertionFailureMessage<TItem>(Action<TItem> assertion, TItem item)
+    {
+        using var ctx = new TestExecutionContext.IsolatedContext();
+
+        try
+        {
+            assertion(item);
+            return null;
+        }
+        catch (ResultStateException exception)
+        {
+            return exception.Message;
+        }
+        catch (Exception exception)
+        {
+            return $"<{exception.GetType().FullName}: {exception.Message}>";
+        }
+    }
+
+    [DoesNotReturn]
+    private static void ReportItemFailures<TItem>(
+        ItemFailure<TItem>[] failures,
+        int itemCount,
+        NUnitString message,
+        string actualExpression,
+        string constraintExpression)
+    {
+        var writer = new MessageWriter();
+        writer.WriteMessageIfNotEmpty(message);
+        writer.WriteAssertThat(actualExpression, constraintExpression);
+        writer.WriteLine($"{failures.Length} of {itemCount} items don't satisfy the assertion.");
+
+        foreach (var failure in failures.Take(MaxReportedItemFailures))
+        {
+            WriteItemFailure(writer, failure);
+        }
+
+        if (failures.Length > MaxReportedItemFailures)
+        {
+            writer.WriteLine($"... and {failures.Length - MaxReportedItemFailures} more.");
+        }
+
+        writer.ReportFailure();
+    }
+
+    private static void WriteItemFailure<TItem>(MessageWriter writer, ItemFailure<TItem> failure)
+    {
+        writer.WriteLine($"[{failure.Index}] {failure.Item.DescribeValue()}:");
+
+        foreach (var line in failure.Message.Split('\n', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries))
+        {
+            writer.WriteLine($"  {line}");
+        }
+    }
+
+    private readonly record struct ItemFailure<TItem>(int Index, TItem Item, string Message);
 
     [return: NotNull]
     public static T ShouldBeSequenceEqualTo<T, TItem>(

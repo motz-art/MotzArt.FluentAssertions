@@ -169,6 +169,17 @@ public class EnumerableAssertionsTests
     }
 
     [Test]
+    public void ShouldAllSatisfy_AssertEachItem()
+    {
+        var users = new List<string> { "Alice", "Bob" };
+        users.ShouldAllSatisfy(user =>
+        {
+            user.ShouldNotBeNullOrEmpty();
+            user.ShouldStartWith(user[..1].ToUpperInvariant());
+        });
+    }
+
+    [Test]
     public void ShouldBeSequenceEqualTo_AssertItemByItem()
     {
         var numbers = new List<int> { 1, 2, 3 };

@@ -1,4 +1,5 @@
 using static MotzArt.FluentAssertions.Tests.TestHelpers;
+using static MotzArt.FluentAssertions.ThrowAssertions;
 using MotzArt.FluentAssertions.Tests.TestData;
 
 namespace MotzArt.FluentAssertions.Tests;
@@ -575,6 +576,109 @@ public class EnumerableAssertionsTests
     {
         var names = new[] { "alice", "bob" };
         names.ShouldNotContain("BOB", StringComparer.Ordinal);
+    }
+
+    [Test]
+    public void ShouldAllSatisfy_ShouldPassAndReturnSourceWhenAllItemsSatisfyAssertion()
+    {
+        var list = new List<int> { 1, 2, 3 };
+        var result = list.ShouldAllSatisfy(x => x.ShouldBeGreaterThan(0));
+        result.ShouldBeSameAs(list);
+    }
+
+    [Test]
+    public void ShouldAllSatisfy_WithTypedLambda_ShouldPreserveCollectionType()
+    {
+        var list = new List<int> { 1, 2, 3 };
+        List<int> result = list.ShouldAllSatisfy((int x) => x.ShouldBeGreaterThan(0));
+        result.ShouldBeSameAs(list);
+    }
+
+    [Test]
+    public void ShouldAllSatisfy_ShouldPassForEmptyCollection()
+    {
+        var array = Array.Empty<int>();
+        array.ShouldAllSatisfy(x => x.ShouldBeGreaterThan(0));
+    }
+
+    [Test]
+    public void ShouldAllSatisfy_ShouldFailListingEachItemThatFails()
+    {
+        var numbers = new List<int> { 1, 2, 3 };
+        ShouldThrowAssertionException(() => numbers.ShouldAllSatisfy(x => x.ShouldBeLessThan(2)))
+            .Message.ShouldBe($"""
+                                 Assert.That({nameof(numbers)}, Has.All.Satisfying(x => x.ShouldBeLessThan(2)))
+                                 2 of 3 items don't satisfy the assertion.
+                                 [1] 2:
+                                   Assert.That(x, Is.LessThan(2))
+                                   Expected: less than 2
+                                   But was:  2
+                                 [2] 3:
+                                   Assert.That(x, Is.LessThan(2))
+                                   Expected: less than 2
+                                   But was:  3
+
+                               """);
+    }
+
+    [Test]
+    public void ShouldAllSatisfy_ShouldReportExceptionsThrownByAssertion()
+    {
+        var numbers = new[] { 1, 2 };
+        ShouldThrowAssertionException(() => numbers.ShouldAllSatisfy(x => ThrowIfEven(x)))
+            .Message.ShouldBe($"""
+                                 Assert.That({nameof(numbers)}, Has.All.Satisfying(x => ThrowIfEven(x)))
+                                 1 of 2 items don't satisfy the assertion.
+                                 [1] 2:
+                                   <System.InvalidOperationException: 2 is even.>
+
+                               """);
+    }
+
+    private static void ThrowIfEven(int number)
+    {
+        if (number % 2 == 0) throw new InvalidOperationException($"{number} is even.");
+    }
+
+    [Test]
+    public void ShouldAllSatisfy_ShouldReportOnlyFirstTenFailures()
+    {
+        var numbers = Enumerable.Range(1, 12).ToArray();
+        var message = ShouldThrowAssertionException(() => numbers.ShouldAllSatisfy(x => x.ShouldBe(0))).Message;
+
+        message.ShouldContain("12 of 12 items don't satisfy the assertion.");
+        message.ShouldContain("[9] 10:");
+        message.ShouldNotContain("[10] 11:");
+        message.ShouldContain("... and 2 more.");
+    }
+
+    [Test]
+    public void ShouldAllSatisfy_ShouldReportItemFailuresInsideAssertMultiple()
+    {
+        var numbers = new[] { 1, 2 };
+        var exception = ShouldThrow<MultipleAssertException>(() => Assert.Multiple(() => numbers.ShouldAllSatisfy(x => x.ShouldBe(1))));
+        exception.Message.ShouldContain("1 of 2 items don't satisfy the assertion.");
+    }
+
+    [Test]
+    public void ShouldAllSatisfy_ShouldFailForNull()
+    {
+        int[]? array = null;
+        ShouldThrowAssertionException(() => array.ShouldAllSatisfy(x => x.ShouldBe(1)))
+            .Message.ShouldBe($"""
+                                 Assert.That({nameof(array)}, Is.Not.Null)
+                                 Expected: not null
+                                 But was:  null
+
+                               """);
+    }
+
+    [Test]
+    public void ShouldAllSatisfy_ShouldIncludeCustomMessage()
+    {
+        var array = new[] { 1, 2 };
+        ShouldThrowAssertionException(() => array.ShouldAllSatisfy(x => x.ShouldBe(1), "Custom message"))
+            .Message.FirstLine(trim: true).ShouldBe("Custom message");
     }
 
     [Test]
