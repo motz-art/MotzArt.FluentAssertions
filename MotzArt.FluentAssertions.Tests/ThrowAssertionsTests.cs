@@ -94,4 +94,109 @@ public class ThrowAssertionsTests
                                But was:  <System.InvalidOperationException: Test exception
                              """);
     }
+
+    [Test]
+    public void ShouldNotThrow_PassWhenNothingIsThrown()
+    {
+        ShouldNotThrow(willThrowNoException);
+    }
+
+    [Test]
+    public void ShouldNotThrow_FailWhenExceptionIsThrown()
+    {
+        ShouldThrowAssertionException(() =>
+        {
+            ShouldNotThrow(throwsInvalidOperationException);
+        }).Message.ShouldStartWith($"""
+                                 Assert.That({nameof(throwsInvalidOperationException)}, Throws.Nothing)
+                                 Expected: no exception
+                                 But was:  <System.InvalidOperationException: Test exception
+                               """);
+    }
+
+    [Test]
+    public void ShouldNotThrow_KeepThrownExceptionAsInnerException()
+    {
+        var assertionException = ShouldThrowAssertionException(() => ShouldNotThrow(throwsInvalidOperationException));
+
+        assertionException.InnerException.ShouldBeOfType<InvalidOperationException>().Message.ShouldBe(TestExceptionMessage);
+    }
+
+    [Test]
+    public void ShouldNotThrow_IncludeCustomMessage()
+    {
+        ShouldThrowAssertionException(() => ShouldNotThrow(throwsInvalidOperationException, "Custom message"))
+            .Message.FirstLine(trim: true).ShouldBe("Custom message");
+    }
+
+    [Test]
+    public void ShouldNotThrow_Fluent_PassWhenNothingIsThrown()
+    {
+        Action act = () => { };
+        act.ShouldNotThrow();
+    }
+
+    [Test]
+    public void ShouldNotThrow_WithFunc_ReturnResult()
+    {
+        Func<int> calculate = () => 42;
+        calculate.ShouldNotThrow().ShouldBe(42);
+    }
+
+    [Test]
+    public void ShouldNotThrow_WithFunc_FailWhenExceptionIsThrown()
+    {
+        Func<int> calculate = () => throw new InvalidOperationException(TestExceptionMessage);
+        ShouldThrowAssertionException(() => calculate.ShouldNotThrow())
+            .Message.ShouldStartWith($"""
+                                 Assert.That({nameof(calculate)}, Throws.Nothing)
+                                 Expected: no exception
+                                 But was:  <System.InvalidOperationException: Test exception
+                               """);
+    }
+
+    [Test]
+    public async Task ShouldNotThrowAsync_PassWhenNothingIsThrown()
+    {
+        await ShouldNotThrowAsync(willThrowNoExceptionAsync);
+    }
+
+    [Test]
+    public async Task ShouldNotThrowAsync_FailWhenExceptionIsThrown()
+    {
+        (await ShouldThrowAssertionExceptionAsync(async () =>
+        {
+            await ShouldNotThrowAsync(throwsInvalidOperationExceptionAsync);
+        })).Message.ShouldStartWith($"""
+                               Assert.That({nameof(throwsInvalidOperationExceptionAsync)}, Throws.Nothing)
+                               Expected: no exception
+                               But was:  <System.InvalidOperationException: Test exception
+                             """);
+    }
+
+    [Test]
+    public async Task ShouldNotThrowAsync_Fluent_PassWhenNothingIsThrown()
+    {
+        Func<Task> act = () => Task.Delay(1);
+        await act.ShouldNotThrowAsync();
+    }
+
+    [Test]
+    public async Task ShouldNotThrowAsync_WithResult_ReturnResult()
+    {
+        Func<Task<int>> calculate = () => Task.FromResult(42);
+        (await calculate.ShouldNotThrowAsync()).ShouldBe(42);
+    }
+
+    [Test]
+    public async Task ShouldNotThrowAsync_WithResult_FailWhenExceptionIsThrown()
+    {
+        Func<Task<int>> calculate = () => Task.FromException<int>(new InvalidOperationException(TestExceptionMessage));
+        (await ShouldThrowAssertionExceptionAsync(() => calculate.ShouldNotThrowAsync()))
+            .Message.ShouldStartWith($"""
+                               Assert.That({nameof(calculate)}, Throws.Nothing)
+                               Expected: no exception
+                               But was:  <System.InvalidOperationException: Test exception
+                             """);
+    }
 }

@@ -420,7 +420,7 @@ public class NumberAssertionsTests
 
 ### Exception Assertions
 
-Assert that code throws expected exceptions:
+Assert that code throws expected exceptions, or throws none:
 
 ``` C#
 // Recommended use of ThrowAssertions.
@@ -475,6 +475,31 @@ public class ThrowAssertionsTests
 
         var ex = await action.ShouldThrowAsync<InvalidOperationException>();
         ex.Message.ShouldBe("Async error");
+    }
+
+    [Test]
+    public void ShouldNotThrow_AssertNoException()
+    {
+        var numbers = new List<int>();
+
+        ShouldNotThrow(() => numbers.Add(1));
+
+        // Func overload returns the result for further assertions
+        Func<int> sum = () => numbers.Sum();
+        sum.ShouldNotThrow().ShouldBe(1);
+    }
+
+    [Test]
+    public async Task ShouldNotThrowAsync_AssertNoAsyncException()
+    {
+        Func<Task<int>> action = async () =>
+        {
+            await Task.Delay(10);
+            return 42;
+        };
+
+        var result = await action.ShouldNotThrowAsync();
+        result.ShouldBe(42);
     }
 }
 ```

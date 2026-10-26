@@ -77,6 +77,78 @@ public static class ThrowAssertions
         throw CreateNoExceptionThrownException<TException>(message, codeExpression);
     }
 
+    public static void ShouldNotThrow(this Action code, NUnitString message = default, [CallerArgumentExpression(nameof(code))] string codeExpression = "")
+    {
+        ShouldNotThrow((TestDelegate)(() => code()), message, codeExpression);
+    }
+
+    public static void ShouldNotThrow(TestDelegate code, NUnitString message = default, [CallerArgumentExpression(nameof(code))] string codeExpression = "")
+    {
+        using var ctx = new TestExecutionContext.IsolatedContext();
+
+        try
+        {
+            code();
+        }
+        catch (Exception exception)
+        {
+            throw CreateExceptionThrownFailure(message, codeExpression, exception);
+        }
+    }
+
+    public static T ShouldNotThrow<T>(this Func<T> code, NUnitString message = default, [CallerArgumentExpression(nameof(code))] string codeExpression = "")
+    {
+        using var ctx = new TestExecutionContext.IsolatedContext();
+
+        try
+        {
+            return code();
+        }
+        catch (Exception exception)
+        {
+            throw CreateExceptionThrownFailure(message, codeExpression, exception);
+        }
+    }
+
+    public static Task ShouldNotThrowAsync(this Func<Task> code, NUnitString message = default, [CallerArgumentExpression(nameof(code))] string codeExpression = "")
+    {
+        return ShouldNotThrowAsync((AsyncTestDelegate)(() => code()), message, codeExpression);
+    }
+
+    public static async Task ShouldNotThrowAsync(AsyncTestDelegate code, NUnitString message = default, [CallerArgumentExpression(nameof(code))] string codeExpression = "")
+    {
+        using var ctx = new TestExecutionContext.IsolatedContext();
+
+        try
+        {
+            await code();
+        }
+        catch (Exception exception)
+        {
+            throw CreateExceptionThrownFailure(message, codeExpression, exception);
+        }
+    }
+
+    public static async Task<T> ShouldNotThrowAsync<T>(this Func<Task<T>> code, NUnitString message = default, [CallerArgumentExpression(nameof(code))] string codeExpression = "")
+    {
+        using var ctx = new TestExecutionContext.IsolatedContext();
+
+        try
+        {
+            return await code();
+        }
+        catch (Exception exception)
+        {
+            throw CreateExceptionThrownFailure(message, codeExpression, exception);
+        }
+    }
+
+    private static AssertionException CreateExceptionThrownFailure(NUnitString message, string codeExpression, Exception exception)
+    {
+        var failureMessage = MessageWriter.Create(message, codeExpression, "Throws.Nothing", "no exception", $"<{exception}>");
+        return new AssertionException(failureMessage, exception);
+    }
+
     private static AssertionException CreateNoExceptionThrownException<TException>(NUnitString message, string codeExpression)
         where TException : Exception
     {
