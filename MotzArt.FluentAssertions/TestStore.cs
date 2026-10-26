@@ -6,16 +6,13 @@ using System.Runtime.CompilerServices;
 
 namespace MotzArt.FluentAssertions;
 
-// Values are stored per NUnit test or suite (test case, fixture, setup fixture, ...) and are visible to all its descendants.
-// For example a value set in OneTimeSetUp of a fixture is visible in all tests of the fixture, a value set in a test is visible only in that test (including its SetUp and TearDown).
-// Lookups go from the current test up through its parents, so parallel tests never see each other's values.
 public static class TestStore
 {
-    private static readonly ConditionalWeakTable<ITest, ConcurrentDictionary<string, object>> _values = new();
+    private static readonly ConditionalWeakTable<ITest, ConcurrentDictionary<string, object>> _valuesByTestOrSuite = new();
 
     public static T Set<T>(string key, T value)
     {
-        GetCurrentValues()[key] = value!;
+        GetOrAddValuesOfCurrentTestOrSuite()[key] = value!;
         return value;
     }
 
@@ -26,16 +23,15 @@ public static class TestStore
             return value;
         }
 
-        return (T)GetCurrentValues().GetOrAdd(key, x => create(x)!);
+        return (T)GetOrAddValuesOfCurrentTestOrSuite().GetOrAdd(key, x => create(x)!);
     }
 
     public static bool TryGet<T>(string key, out T value)
     {
-        for (ITest? test = GetCurrentTest(); test != null; test = test.Parent)
+        foreach (var testOrSuite in GetCurrentTestOrSuiteAndItsParents())
         {
-            if (_values.TryGetValue(test, out var values) && values.TryGetValue(key, out var obj))
+            if (TryGetValueOfTestOrSuite(testOrSuite, key, out value))
             {
-                value = (T)obj;
                 return true;
             }
         }
@@ -44,18 +40,37 @@ public static class TestStore
         return false;
     }
 
-    // Removes the value only from the current test or suite, values of parents are not affected.
     public static bool Remove(string key)
     {
-        return _values.TryGetValue(GetCurrentTest(), out var values) && values.TryRemove(key, out _);
+        return _valuesByTestOrSuite.TryGetValue(GetCurrentTestOrSuite(), out var values) && values.TryRemove(key, out _);
     }
 
-    private static ConcurrentDictionary<string, object> GetCurrentValues()
+    private static bool TryGetValueOfTestOrSuite<T>(ITest testOrSuite, string key, out T value)
     {
-        return _values.GetValue(GetCurrentTest(), _ => new());
+        if (_valuesByTestOrSuite.TryGetValue(testOrSuite, out var values) && values.TryGetValue(key, out var storedValue))
+        {
+            value = (T)storedValue;
+            return true;
+        }
+
+        value = default!;
+        return false;
     }
 
-    private static Test GetCurrentTest()
+    private static IEnumerable<ITest> GetCurrentTestOrSuiteAndItsParents()
+    {
+        for (ITest? testOrSuite = GetCurrentTestOrSuite(); testOrSuite != null; testOrSuite = testOrSuite.Parent)
+        {
+            yield return testOrSuite;
+        }
+    }
+
+    private static ConcurrentDictionary<string, object> GetOrAddValuesOfCurrentTestOrSuite()
+    {
+        return _valuesByTestOrSuite.GetValue(GetCurrentTestOrSuite(), _ => new());
+    }
+
+    private static Test GetCurrentTestOrSuite()
     {
         return TestExecutionContext.CurrentContext.CurrentTest;
     }

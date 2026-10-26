@@ -37,15 +37,19 @@ namespace MotzArt.FluentAssertions.Tests.StoreTests
             TestStore.TryGet(TestKey, out string _).ShouldBeFalse();
             TestStore.Set(TestKey, value);
 
-            // Wait for other tests to set their values, so they run concurrently.
-            AllTestsStarted.Signal();
-            AllTestsStarted.Wait(TimeSpan.FromSeconds(5));
+            WaitForOtherTestsToSetTheirValues();
 
             TestStore.TryGet(TestKey, out string storedValue).ShouldBeTrue();
             storedValue.ShouldBe(value);
 
             TestStore.TryGet(FixtureKey, out string fixtureValue).ShouldBeTrue();
             fixtureValue.ShouldBe(FixtureValue);
+        }
+
+        private static void WaitForOtherTestsToSetTheirValues()
+        {
+            AllTestsStarted.Signal();
+            AllTestsStarted.Wait(TimeSpan.FromSeconds(5));
         }
     }
 }

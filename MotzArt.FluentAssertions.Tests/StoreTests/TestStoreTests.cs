@@ -152,6 +152,15 @@ namespace MotzArt.FluentAssertions.Tests.StoreTests
                 TestStore.TryGet(OneTimeSetupName, out string value).ShouldBeTrue();
                 value.ShouldBe(FixtureScopeValue);
             }
+
+            [Test]
+            public void Remove_ShouldNotRemoveValueOfFixture()
+            {
+                TestStore.Remove(OneTimeSetupName).ShouldBeFalse();
+
+                TestStore.TryGet(OneTimeSetupName, out string value).ShouldBeTrue();
+                value.ShouldBe(FixtureScopeValue);
+            }
         }
     }
 }
