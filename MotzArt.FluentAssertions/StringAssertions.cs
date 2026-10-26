@@ -2,6 +2,7 @@
 using NUnit.Framework;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
 namespace MotzArt.FluentAssertions;
@@ -165,6 +166,40 @@ public static class StringAssertions
     {
         var comparer = GetComparer(comparison);
         Assert.That(str, Is.Not.EqualTo(expectedValue).Using(comparer), message, actualExpression: strExpression, constraintExpression: $"Is.Not.EqualTo({DescribeValuesExtensions.FormatValue(expectedValue)}).Using({nameof(StringComparison)}.{comparison})");
+        return str;
+    }
+
+    public static string ShouldMatch(this string? str, [StringSyntax(StringSyntaxAttribute.Regex)] string pattern, NUnitString message = default, [CallerArgumentExpression(nameof(str))] string strExpression = "")
+    {
+        str.ShouldNotBeNull(message, strExpression);
+        Assert.That(str, Does.Match(pattern), message, actualExpression: strExpression, constraintExpression: $"Does.Match({DescribeValuesExtensions.FormatValue(pattern)})");
+        return str;
+    }
+
+    public static string ShouldMatch(this string? str, Regex regex, NUnitString message = default, [CallerArgumentExpression(nameof(str))] string strExpression = "", [CallerArgumentExpression(nameof(regex))] string regexExpression = "")
+    {
+        str.ShouldNotBeNull(message, strExpression);
+        Assert.That(str, Does.Match(regex), message, actualExpression: strExpression, constraintExpression: $"Does.Match({regexExpression})");
+        return str;
+    }
+
+    public static string? ShouldNotMatch(this string? str, [StringSyntax(StringSyntaxAttribute.Regex)] string pattern, NUnitString message = default, [CallerArgumentExpression(nameof(str))] string strExpression = "")
+    {
+        if (str != null)
+        {
+            Assert.That(str, Does.Not.Match(pattern), message, actualExpression: strExpression, constraintExpression: $"Does.Not.Match({DescribeValuesExtensions.FormatValue(pattern)})");
+        }
+
+        return str;
+    }
+
+    public static string? ShouldNotMatch(this string? str, Regex regex, NUnitString message = default, [CallerArgumentExpression(nameof(str))] string strExpression = "", [CallerArgumentExpression(nameof(regex))] string regexExpression = "")
+    {
+        if (str != null)
+        {
+            Assert.That(str, Does.Not.Match(regex), message, actualExpression: strExpression, constraintExpression: $"Does.Not.Match({regexExpression})");
+        }
+
         return str;
     }
 

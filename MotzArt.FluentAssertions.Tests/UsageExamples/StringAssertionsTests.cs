@@ -93,4 +93,12 @@ public class StringAssertionsTests
         string value = "hello world";
         value.ShouldNotContain("goodbye");
     }
+
+    [Test]
+    public void ShouldMatch_AssertRegexMatch()
+    {
+        string orderNumber = "ORD-123";
+        orderNumber.ShouldMatch(@"^ORD-\d+$");
+        orderNumber.ShouldNotMatch(@"^INV-\d+$");
+    }
 }

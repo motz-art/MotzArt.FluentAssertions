@@ -1,3 +1,4 @@
+﻿using System.Text.RegularExpressions;
 using static MotzArt.FluentAssertions.Tests.TestHelpers;
 
 namespace MotzArt.FluentAssertions.Tests;
@@ -463,5 +464,108 @@ public class StringAssertionsTests
                                   But was:  "Hello, World!"
                                 
                                 """);
+    }
+
+    [Test]
+    public void ShouldMatch_ShouldPassAndReturnStringWhenPatternMatches()
+    {
+        var orderNumber = "ORD-123";
+        orderNumber.ShouldMatch(@"^ORD-\d+$").ShouldBeSameAs(orderNumber);
+    }
+
+    [Test]
+    public void ShouldMatch_ShouldFailWhenPatternDoesNotMatch()
+    {
+        var orderNumber = "ORD-ABC";
+        ShouldThrowAssertionException(() => orderNumber.ShouldMatch(@"^ORD-\d+$"))
+            .Message.ShouldBe($"""
+                                 Assert.That({nameof(orderNumber)}, Does.Match("^ORD-\\d+$"))
+                                 Expected: String matching "^ORD-\d+$"
+                                 But was:  "ORD-ABC"
+
+                               """);
+    }
+
+    [Test]
+    public void ShouldMatch_ShouldFailForNull()
+    {
+        string? orderNumber = null;
+        ShouldThrowAssertionException(() => orderNumber.ShouldMatch(@"^ORD-\d+$"))
+            .Message.ShouldBe($"""
+                                 Assert.That({nameof(orderNumber)}, Is.Not.Null)
+                                 Expected: not null
+                                 But was:  null
+
+                               """);
+    }
+
+    [Test]
+    public void ShouldMatch_ShouldIncludeCustomMessage()
+    {
+        var orderNumber = "ORD-ABC";
+        ShouldThrowAssertionException(() => orderNumber.ShouldMatch(@"^ORD-\d+$", "Custom message"))
+            .Message.FirstLine(trim: true).ShouldBe("Custom message");
+    }
+
+    [Test]
+    public void ShouldMatch_WithRegex_ShouldPassWhenRegexMatches()
+    {
+        var orderNumber = "ord-123";
+        orderNumber.ShouldMatch(new Regex(@"^ORD-\d+$", RegexOptions.IgnoreCase)).ShouldBeSameAs(orderNumber);
+    }
+
+    [Test]
+    public void ShouldMatch_WithRegex_ShouldFailWhenRegexDoesNotMatch()
+    {
+        var orderNumber = "ORD-ABC";
+        var orderNumberRegex = new Regex(@"^ORD-\d+$");
+        ShouldThrowAssertionException(() => orderNumber.ShouldMatch(orderNumberRegex))
+            .Message.ShouldBe($"""
+                                 Assert.That({nameof(orderNumber)}, Does.Match({nameof(orderNumberRegex)}))
+                                 Expected: String matching "^ORD-\d+$"
+                                 But was:  "ORD-ABC"
+
+                               """);
+    }
+
+    [Test]
+    public void ShouldNotMatch_ShouldPassAndReturnStringWhenPatternDoesNotMatch()
+    {
+        var orderNumber = "ORD-ABC";
+        orderNumber.ShouldNotMatch(@"^ORD-\d+$").ShouldBeSameAs(orderNumber);
+    }
+
+    [Test]
+    public void ShouldNotMatch_ShouldPassForNull()
+    {
+        string? orderNumber = null;
+        orderNumber.ShouldNotMatch(@"^ORD-\d+$").ShouldBeNull();
+    }
+
+    [Test]
+    public void ShouldNotMatch_ShouldFailWhenPatternMatches()
+    {
+        var orderNumber = "ORD-123";
+        ShouldThrowAssertionException(() => orderNumber.ShouldNotMatch(@"^ORD-\d+$"))
+            .Message.ShouldBe($"""
+                                 Assert.That({nameof(orderNumber)}, Does.Not.Match("^ORD-\\d+$"))
+                                 Expected: not String matching "^ORD-\d+$"
+                                 But was:  "ORD-123"
+
+                               """);
+    }
+
+    [Test]
+    public void ShouldNotMatch_WithRegex_ShouldFailWhenRegexMatches()
+    {
+        var orderNumber = "ORD-123";
+        var orderNumberRegex = new Regex(@"^ORD-\d+$");
+        ShouldThrowAssertionException(() => orderNumber.ShouldNotMatch(orderNumberRegex))
+            .Message.ShouldBe($"""
+                                 Assert.That({nameof(orderNumber)}, Does.Not.Match({nameof(orderNumberRegex)}))
+                                 Expected: not String matching "^ORD-\d+$"
+                                 But was:  "ORD-123"
+
+                               """);
     }
 }
