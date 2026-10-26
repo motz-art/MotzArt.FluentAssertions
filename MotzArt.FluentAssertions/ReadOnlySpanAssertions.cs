@@ -1,13 +1,21 @@
 ﻿using MotzArt.FluentAssertions.Helpers;
 using NUnit.Framework;
 using System.Runtime.CompilerServices;
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
 namespace MotzArt.FluentAssertions;
 
+/// <summary>
+/// Assertions for <see cref="ReadOnlySpan{T}"/> values.
+/// </summary>
+/// <remarks>
+/// A failed comparison reports the lengths of both spans and the index of the first differing item.
+/// </remarks>
 public static class ReadOnlySpanAssertions
 {
 
+    /// <summary>
+    /// Asserts that <paramref name="source"/> has no items.
+    /// </summary>
     public static void ShouldBeEmpty<T>(
         this ReadOnlySpan<T> source,
         NUnitString message = default,
@@ -20,6 +28,10 @@ public static class ReadOnlySpanAssertions
         }
     }
 
+    /// <summary>
+    /// Asserts that <paramref name="source"/> has at least one item.
+    /// </summary>
+    /// <returns>The asserted span, for chaining further assertions.</returns>
     public static ReadOnlySpan<T> ShouldNotBeEmpty<T>(
         this ReadOnlySpan<T> source,
         NUnitString message = default,
@@ -35,6 +47,11 @@ public static class ReadOnlySpanAssertions
     }
 
 
+    /// <summary>
+    /// Asserts that <paramref name="actual"/> has the same items as <paramref name="expected"/> in the same order,
+    /// comparing items with <see cref="EqualityComparer{T}.Default"/>.
+    /// </summary>
+    /// <returns>The asserted span, for chaining further assertions.</returns>
     public static ReadOnlySpan<T> ShouldBe<T>(this ReadOnlySpan<T> actual, ReadOnlySpan<T> expected,
         NUnitString message = default,
         [CallerArgumentExpression(nameof(actual))] string actualExpression = "<some-value>", [CallerArgumentExpression(nameof(expected))] string otherExpression = "<ReadOnlySpan>")
@@ -43,6 +60,11 @@ public static class ReadOnlySpanAssertions
             constraintExpression: $"Is.EqualTo({otherExpression})");
     }
 
+    /// <summary>
+    /// Asserts that <paramref name="actual"/> has the same items as <paramref name="expected"/> in the same order,
+    /// comparing items with <paramref name="comparer"/>.
+    /// </summary>
+    /// <returns>The asserted span, for chaining further assertions.</returns>
     public static ReadOnlySpan<T> ShouldBe<T>(this ReadOnlySpan<T> actual, ReadOnlySpan<T> expected,
         IEqualityComparer<T> comparer,
         NUnitString message = default,
@@ -56,6 +78,11 @@ public static class ReadOnlySpanAssertions
             constraintExpression: $"Is.EqualTo({otherExpression}).Using({comparerExpression})");
     }
 
+    /// <summary>
+    /// Asserts that <paramref name="actual"/> has as many items as <paramref name="expected"/> and that
+    /// <paramref name="itemsAreEqual"/> returns <see langword="true"/> for each pair of items at the same index.
+    /// </summary>
+    /// <returns>The asserted span, for chaining further assertions.</returns>
     public static ReadOnlySpan<TActual> ShouldBe<TActual, TExpected>(this ReadOnlySpan<TActual> actual, ReadOnlySpan<TExpected> expected,
         Func<TActual, TExpected, bool> itemsAreEqual,
         NUnitString message = default,
