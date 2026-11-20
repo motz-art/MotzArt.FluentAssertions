@@ -960,4 +960,131 @@ public class EnumerableAssertionsTests
 
                                """);
     }
+
+    [Test]
+    public void ShouldBeMultisetEqualTo_ShouldPassForSameItemsInDifferentOrder()
+    {
+        var list = new List<int> { 1, 2, 2, 3 };
+        List<int> result = list.ShouldBeMultisetEqualTo([2, 3, 1, 2]);
+        result.ShouldBeSameAs(list);
+    }
+
+    [Test]
+    public void ShouldBeMultisetEqualTo_ShouldPassForEmptyCollections()
+    {
+        new List<int>().ShouldBeMultisetEqualTo([]);
+    }
+
+    [Test]
+    public void ShouldBeMultisetEqualTo_ShouldPassForNullItems()
+    {
+        var actual = new[] { null, "a", null };
+        actual.ShouldBeMultisetEqualTo(["a", null, null]);
+    }
+
+    [Test]
+    public void ShouldBeMultisetEqualTo_ShouldFailWhenDuplicateIsMissing()
+    {
+        var actual = new[] { 1, 2 };
+        var expected = new[] { 2, 1, 2 };
+        ShouldThrowAssertionException(() => actual.ShouldBeMultisetEqualTo(expected))
+            .Message.ShouldBe($"""
+                                 Assert.That({nameof(actual)}, Is.EquivalentTo({nameof(expected)}))
+                                 Missing items: [2]
+                                 Expected: [2, 1, 2]
+                                 But was:  [1, 2]
+
+                               """);
+    }
+
+    [Test]
+    public void ShouldBeMultisetEqualTo_ShouldFailWhenThereIsAnExtraDuplicate()
+    {
+        var actual = new[] { 1, 1, 2 };
+        var expected = new[] { 2, 1 };
+        ShouldThrowAssertionException(() => actual.ShouldBeMultisetEqualTo(expected))
+            .Message.ShouldBe($"""
+                                 Assert.That({nameof(actual)}, Is.EquivalentTo({nameof(expected)}))
+                                 Extra items: [1]
+                                 Expected: [2, 1]
+                                 But was:  [1, 1, 2]
+
+                               """);
+    }
+
+    [Test]
+    public void ShouldBeMultisetEqualTo_ShouldFailWhenItemsAreMissingAndExtra()
+    {
+        var actual = new[] { 1, 2, 4 };
+        var expected = new[] { 3, 2, 1 };
+        ShouldThrowAssertionException(() => actual.ShouldBeMultisetEqualTo(expected))
+            .Message.ShouldBe($"""
+                                 Assert.That({nameof(actual)}, Is.EquivalentTo({nameof(expected)}))
+                                 Missing items: [3]
+                                 Extra items: [4]
+                                 Expected: [3, 2, 1]
+                                 But was:  [1, 2, 4]
+
+                               """);
+    }
+
+    [Test]
+    public void ShouldBeMultisetEqualTo_ShouldFailWhenActualIsEmpty()
+    {
+        var actual = new List<int>();
+        var expected = new[] { 1 };
+        ShouldThrowAssertionException(() => actual.ShouldBeMultisetEqualTo(expected))
+            .Message.ShouldBe($"""
+                                 Assert.That({nameof(actual)}, Is.EquivalentTo({nameof(expected)}))
+                                 Missing items: [1]
+                                 Expected: [1]
+                                 But was:  <empty>
+
+                               """);
+    }
+
+    [Test]
+    public void ShouldBeMultisetEqualTo_ShouldIncludeCustomMessage()
+    {
+        var actual = new[] { 1 };
+        ShouldThrowAssertionException(() => actual.ShouldBeMultisetEqualTo([2], "Custom message"))
+            .Message.FirstLine(trim: true).ShouldBe("Custom message");
+    }
+
+    [Test]
+    public void ShouldBeMultisetEqualTo_ShouldFailForNull()
+    {
+        int[]? items = null;
+        ShouldThrowAssertionException(() => items.ShouldBeMultisetEqualTo([1]))
+            .Message.ShouldBe($"""
+                                 Assert.That({nameof(items)}, Is.Not.Null)
+                                 Expected: not null
+                                 But was:  null
+
+                               """);
+    }
+
+    [Test]
+    public void ShouldBeMultisetEqualTo_WithComparer_ShouldPassWhenComparerMatches()
+    {
+        var list = new List<string> { "a", "b", "a" };
+        List<string> result = list.ShouldBeMultisetEqualTo(["A", "B", "A"], StringComparer.OrdinalIgnoreCase);
+        result.ShouldBeSameAs(list);
+    }
+
+    [Test]
+    public void ShouldBeMultisetEqualTo_WithComparer_ShouldFailWhenComparerDoesNotMatch()
+    {
+        var actual = new[] { "a", "b" };
+        var expected = new[] { "A", "C" };
+        ShouldThrowAssertionException(() => actual.ShouldBeMultisetEqualTo(expected, StringComparer.OrdinalIgnoreCase))
+            .Message.ShouldBe($"""
+                                 Assert.That({nameof(actual)}, Is.EquivalentTo({nameof(expected)}).Using(StringComparer.OrdinalIgnoreCase))
+                                 Missing items: [C]
+                                 Extra items: [b]
+                                 Expected: [A, C]
+                                 But was:  [a, b]
+
+                               """);
+    }
 }

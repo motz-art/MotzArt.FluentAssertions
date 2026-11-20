@@ -758,4 +758,138 @@ public static class EnumerableAssertions
 
         return new HashSet<TItem>(items, comparer);
     }
+
+    /// <summary>
+    /// Asserts that <paramref name="actual"/> holds the same items as <paramref name="expected"/>, each the same number of times, in any order.
+    /// </summary>
+    /// <returns><paramref name="actual"/>, for chaining.</returns>
+    /// <exception cref="AssertionException">Thrown when <paramref name="actual"/> is null, or when an item is missing from it or occurs in it more times than expected.</exception>
+    [return: NotNull]
+    public static T ShouldBeMultisetEqualTo<T, TItem>(
+        [NotNull] this T? actual,
+        IEnumerable<TItem> expected,
+        NUnitString message = default,
+        [CallerArgumentExpression(nameof(actual))] string actualExpression = "<some-value>",
+        [CallerArgumentExpression(nameof(expected))] string expectedExpression = "<expected-value>") where T : IEnumerable<TItem>
+    {
+        return AssertMultisetEqual<T, TItem>(actual, expected, EqualityComparer<TItem>.Default, message, actualExpression, expectedExpression,
+            constraintExpression: $"Is.EquivalentTo({expectedExpression})");
+    }
+
+    /// <summary>
+    /// Asserts that <paramref name="actual"/> holds the same items as <paramref name="expected"/>, each the same number of times, in any order.
+    /// Used when the item type can't be inferred from <paramref name="expected"/>, e.g. for an empty collection expression.
+    /// </summary>
+    /// <returns><paramref name="actual"/>, for chaining.</returns>
+    /// <exception cref="AssertionException">Thrown when <paramref name="actual"/> is null, or when an item is missing from it or occurs in it more times than expected.</exception>
+    [return: NotNull]
+    public static IEnumerable<T> ShouldBeMultisetEqualTo<T>(
+        [NotNull] this IEnumerable<T>? actual,
+        IEnumerable<T> expected,
+        NUnitString message = default,
+        [CallerArgumentExpression(nameof(actual))] string actualExpression = "<some-value>",
+        [CallerArgumentExpression(nameof(expected))] string expectedExpression = "<expected-value>")
+    {
+        return AssertMultisetEqual<IEnumerable<T>, T>(actual, expected, EqualityComparer<T>.Default, message, actualExpression, expectedExpression,
+            constraintExpression: $"Is.EquivalentTo({expectedExpression})");
+    }
+
+    /// <summary>
+    /// Asserts that <paramref name="actual"/> holds the same items as <paramref name="expected"/>, each the same number of times, in any order,
+    /// comparing items with <paramref name="comparer"/>.
+    /// </summary>
+    /// <returns><paramref name="actual"/>, for chaining.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="comparer"/> is null.</exception>
+    /// <exception cref="AssertionException">Thrown when <paramref name="actual"/> is null, or when an item is missing from it or occurs in it more times than expected.</exception>
+    [return: NotNull]
+    public static T ShouldBeMultisetEqualTo<T, TItem>(
+        [NotNull] this T? actual,
+        IEnumerable<TItem> expected,
+        IEqualityComparer<TItem> comparer,
+        NUnitString message = default,
+        [CallerArgumentExpression(nameof(actual))] string actualExpression = "<some-value>",
+        [CallerArgumentExpression(nameof(expected))] string expectedExpression = "<expected-value>",
+        [CallerArgumentExpression(nameof(comparer))] string comparerExpression = "<comparer>") where T : IEnumerable<TItem>
+    {
+        ArgumentNullException.ThrowIfNull(comparer);
+
+        return AssertMultisetEqual<T, TItem>(actual, expected, comparer, message, actualExpression, expectedExpression,
+            constraintExpression: $"Is.EquivalentTo({expectedExpression}).Using({comparerExpression})");
+    }
+
+    private static T AssertMultisetEqual<T, TItem>(
+        [NotNull] T? actual,
+        IEnumerable<TItem> expected,
+        IEqualityComparer<TItem> comparer,
+        NUnitString message,
+        string actualExpression,
+        string expectedExpression,
+        string constraintExpression) where T : IEnumerable<TItem>
+    {
+        actual.ShouldNotBeNull(valueExpression: actualExpression);
+        ArgumentNullException.ThrowIfNull(expected, expectedExpression);
+
+        var actualItems = actual.ToArray();
+        var expectedItems = expected.ToArray();
+
+        var (missingItems, extraItems) = FindUnmatchedItems(actualItems, expectedItems, comparer);
+
+        if (missingItems.Length > 0 || extraItems.Length > 0)
+        {
+            ReportUnmatchedItems(actualItems, expectedItems, missingItems, extraItems, message, actualExpression, constraintExpression);
+        }
+
+        return actual;
+    }
+
+    private static (TItem[] MissingItems, TItem[] ExtraItems) FindUnmatchedItems<TItem>(TItem[] actualItems, TItem[] expectedItems, IEqualityComparer<TItem> comparer)
+    {
+        var missingItems = new List<TItem>(expectedItems);
+        var extraItems = new List<TItem>();
+
+        foreach (var item in actualItems)
+        {
+            var missingIndex = missingItems.FindIndex(x => comparer.Equals(x, item));
+
+            if (missingIndex < 0)
+            {
+                extraItems.Add(item);
+            }
+            else
+            {
+                missingItems.RemoveAt(missingIndex);
+            }
+        }
+
+        return (missingItems.ToArray(), extraItems.ToArray());
+    }
+
+    private static void ReportUnmatchedItems<TItem>(
+        TItem[] actualItems,
+        TItem[] expectedItems,
+        TItem[] missingItems,
+        TItem[] extraItems,
+        NUnitString message,
+        string actualExpression,
+        string constraintExpression)
+    {
+        var writer = new MessageWriter();
+        writer.WriteMessageIfNotEmpty(message);
+        writer.WriteAssertThat(actualExpression, constraintExpression);
+
+        if (missingItems.Length > 0)
+        {
+            writer.WriteLine($"Missing items: {DescribeItems(missingItems)}");
+        }
+
+        if (extraItems.Length > 0)
+        {
+            writer.WriteLine($"Extra items: {DescribeItems(extraItems)}");
+        }
+
+        writer.WriteExpected(DescribeItems(expectedItems));
+        writer.WriteActual(DescribeItems(actualItems));
+
+        writer.ReportFailure();
+    }
 }

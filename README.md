@@ -201,6 +201,16 @@ public class EnumerableAssertionsTests
         var names = new HashSet<string> { "alice", "bob" };
         names.ShouldBeSetEqualTo(["Bob", "Alice"], StringComparer.OrdinalIgnoreCase);
     }
+
+    [Test]
+    public void ShouldBeMultisetEqualTo_AssertSameItemsAndCountsIgnoringOrder()
+    {
+        var letters = new List<char> { 'a', 'b', 'a' };
+        letters.ShouldBeMultisetEqualTo(['a', 'a', 'b']);
+
+        var names = new[] { "alice", "bob", "alice" };
+        names.ShouldBeMultisetEqualTo(["Bob", "Alice", "Alice"], StringComparer.OrdinalIgnoreCase);
+    }
 }
 ```
 
