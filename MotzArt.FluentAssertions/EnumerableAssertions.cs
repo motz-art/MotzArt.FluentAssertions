@@ -2,6 +2,8 @@
 using NUnit.Framework;
 using NUnit.Framework.Internal;
 using System.Collections;
+using System.Collections.Frozen;
+using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using static MotzArt.FluentAssertions.Helpers.MessageUtils;
@@ -646,7 +648,9 @@ public static class EnumerableAssertions
     /// Asserts that every item of <paramref name="actual"/> is in <paramref name="expected"/> and vice versa, ignoring order and duplicates.
     /// </summary>
     /// <remarks>
-    /// Sets are checked with their own comparer; other sequences use <see cref="EqualityComparer{T}.Default"/>.
+    /// Both sides are compared with the comparer of <paramref name="actual"/> when it is a <see cref="HashSet{T}"/>, <see cref="FrozenSet{T}"/>
+    /// or <see cref="ImmutableHashSet{T}"/>, otherwise with the comparer of <paramref name="expected"/> when it is one,
+    /// otherwise with <see cref="EqualityComparer{T}.Default"/>.
     /// The failure message lists the missing and the extra items.
     /// </remarks>
     /// <returns>The asserted collection, for chaining further assertions.</returns>
@@ -666,7 +670,9 @@ public static class EnumerableAssertions
     /// Asserts that every item of <paramref name="actual"/> is in <paramref name="expected"/> and vice versa, ignoring order and duplicates.
     /// </summary>
     /// <remarks>
-    /// Sets are checked with their own comparer; other sequences use <see cref="EqualityComparer{T}.Default"/>.
+    /// Both sides are compared with the comparer of <paramref name="actual"/> when it is a <see cref="HashSet{T}"/>, <see cref="FrozenSet{T}"/>
+    /// or <see cref="ImmutableHashSet{T}"/>, otherwise with the comparer of <paramref name="expected"/> when it is one,
+    /// otherwise with <see cref="EqualityComparer{T}.Default"/>.
     /// The failure message lists the missing and the extra items.
     /// </remarks>
     /// <returns>The asserted sequence, for chaining further assertions.</returns>
@@ -719,8 +725,9 @@ public static class EnumerableAssertions
         actual.ShouldNotBeNull(valueExpression: actualExpression);
         ArgumentNullException.ThrowIfNull(expected, expectedExpression);
 
-        var actualSet = AsSet(actual, comparer);
-        var expectedSet = AsSet(expected, comparer);
+        var itemComparer = comparer ?? FindSetComparer(actual) ?? FindSetComparer(expected);
+        var actualSet = AsSet(actual, itemComparer);
+        var expectedSet = AsSet(expected, itemComparer);
 
         var missingItems = expectedSet.Where(x => !actualSet.Contains(x)).ToArray();
         var extraItems = actualSet.Where(x => !expectedSet.Contains(x)).ToArray();
@@ -753,12 +760,23 @@ public static class EnumerableAssertions
 
     private static IReadOnlySet<TItem> AsSet<TItem>(IEnumerable<TItem> items, IEqualityComparer<TItem>? comparer)
     {
-        if (comparer == null && items is IReadOnlySet<TItem> set)
+        if (items is IReadOnlySet<TItem> set && Equals(FindSetComparer(items), comparer))
         {
             return set;
         }
 
         return new HashSet<TItem>(items, comparer);
+    }
+
+    private static IEqualityComparer<TItem>? FindSetComparer<TItem>(IEnumerable<TItem> items)
+    {
+        return items switch
+        {
+            HashSet<TItem> hashSet => hashSet.Comparer,
+            FrozenSet<TItem> frozenSet => frozenSet.Comparer,
+            ImmutableHashSet<TItem> immutableHashSet => immutableHashSet.KeyComparer,
+            _ => null,
+        };
     }
 
     /// <summary>

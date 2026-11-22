@@ -1,6 +1,8 @@
 using static MotzArt.FluentAssertions.Tests.TestHelpers;
 using static MotzArt.FluentAssertions.ThrowAssertions;
 using MotzArt.FluentAssertions.Tests.TestData;
+using System.Collections.Frozen;
+using System.Collections.Immutable;
 
 namespace MotzArt.FluentAssertions.Tests;
 
@@ -873,6 +875,44 @@ public class EnumerableAssertionsTests
         var actual = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "a", "b" };
         var expected = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "B", "A" };
         actual.ShouldBeSetEqualTo(expected);
+    }
+
+    [Test]
+    public void ShouldBeSetEqualTo_ShouldCompareSequenceWithComparerOfActualSet()
+    {
+        var actual = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "A" };
+        actual.ShouldBeSetEqualTo(["a"]);
+    }
+
+    [Test]
+    public void ShouldBeSetEqualTo_ShouldCompareSequenceWithComparerOfExpectedSet()
+    {
+        var actual = new[] { "a", "A" };
+        var expected = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "A" };
+        actual.ShouldBeSetEqualTo(expected);
+    }
+
+    [Test]
+    public void ShouldBeSetEqualTo_ShouldCompareSequenceWithComparerOfActualFrozenSet()
+    {
+        var actual = new[] { "A" }.ToFrozenSet(StringComparer.OrdinalIgnoreCase);
+        actual.ShouldBeSetEqualTo(["a"]);
+    }
+
+    [Test]
+    public void ShouldBeSetEqualTo_ShouldCompareSequenceWithComparerOfActualImmutableSet()
+    {
+        var actual = ImmutableHashSet.Create(StringComparer.OrdinalIgnoreCase, "A");
+        actual.ShouldBeSetEqualTo(["a"]);
+    }
+
+    [Test]
+    public void ShouldBeSetEqualTo_ShouldUseComparerOfActualWhenBothSetsHaveComparers()
+    {
+        var actual = new HashSet<string>(StringComparer.Ordinal) { "a", "A" };
+        var expected = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "A" };
+        ShouldThrowAssertionException(() => actual.ShouldBeSetEqualTo(expected))
+            .Message.ShouldContain("Extra items: [a]");
     }
 
     [Test]
