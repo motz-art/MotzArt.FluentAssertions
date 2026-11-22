@@ -1171,4 +1171,28 @@ public class EnumerableAssertionsTests
 
                                """);
     }
+
+    [Test]
+    public void ShouldBeSequenceEqualTo_ShouldThrowArgumentNullExceptionForNullExpected()
+    {
+        int[] nullSequence = null!;
+        ShouldThrow<ArgumentNullException>(() => new[] { 1 }.ShouldBeSequenceEqualTo(nullSequence))
+            .ParamName.ShouldBe("expected");
+    }
+
+    [Test]
+    public void ShouldBeSetEqualTo_ShouldThrowArgumentNullExceptionForNullExpected()
+    {
+        int[] nullSequence = null!;
+        ShouldThrow<ArgumentNullException>(() => new[] { 1 }.ShouldBeSetEqualTo(nullSequence))
+            .ParamName.ShouldBe("expected");
+    }
+
+    [Test]
+    public void ShouldBeMultisetEqualTo_ShouldThrowArgumentNullExceptionForNullExpected()
+    {
+        int[] nullSequence = null!;
+        ShouldThrow<ArgumentNullException>(() => new[] { 1 }.ShouldBeMultisetEqualTo(nullSequence))
+            .ParamName.ShouldBe("expected");
+    }
 }

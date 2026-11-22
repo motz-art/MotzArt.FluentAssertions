@@ -502,7 +502,7 @@ public static class EnumerableAssertions
         [CallerArgumentExpression(nameof(actual))] string actualExpression = "<some-value>",
         [CallerArgumentExpression(nameof(expected))] string expectedExpression = "<expected-value>") where T : IEnumerable<TItem>
     {
-        return AssertSequenceEqual<T, TItem, TItem>(actual, expected, EqualityComparer<TItem>.Default.Equals, message, actualExpression, expectedExpression,
+        return AssertSequenceEqual<T, TItem, TItem>(actual, expected, EqualityComparer<TItem>.Default.Equals, message, actualExpression,
             constraintExpression: $"Is.EqualTo({expectedExpression})");
     }
 
@@ -522,7 +522,7 @@ public static class EnumerableAssertions
         [CallerArgumentExpression(nameof(actual))] string actualExpression = "<some-value>",
         [CallerArgumentExpression(nameof(expected))] string expectedExpression = "<expected-value>")
     {
-        return AssertSequenceEqual<IEnumerable<T>, T, T>(actual, expected, EqualityComparer<T>.Default.Equals, message, actualExpression, expectedExpression,
+        return AssertSequenceEqual<IEnumerable<T>, T, T>(actual, expected, EqualityComparer<T>.Default.Equals, message, actualExpression,
             constraintExpression: $"Is.EqualTo({expectedExpression})");
     }
 
@@ -546,7 +546,7 @@ public static class EnumerableAssertions
     {
         ArgumentNullException.ThrowIfNull(comparer);
 
-        return AssertSequenceEqual<T, TItem, TItem>(actual, expected, comparer.Equals, message, actualExpression, expectedExpression,
+        return AssertSequenceEqual<T, TItem, TItem>(actual, expected, comparer.Equals, message, actualExpression,
             constraintExpression: $"Is.EqualTo({expectedExpression}).Using({comparerExpression})");
     }
 
@@ -568,7 +568,7 @@ public static class EnumerableAssertions
         [CallerArgumentExpression(nameof(expected))] string expectedExpression = "<expected-value>",
         [CallerArgumentExpression(nameof(itemsAreEqual))] string predicateExpression = "<predicate>") where T : IEnumerable<TActual>
     {
-        return AssertSequenceEqual(actual, expected, itemsAreEqual, message, actualExpression, expectedExpression,
+        return AssertSequenceEqual(actual, expected, itemsAreEqual, message, actualExpression,
             constraintExpression: $"Is.EqualTo({expectedExpression}).Using({predicateExpression})");
     }
 
@@ -590,7 +590,7 @@ public static class EnumerableAssertions
         [CallerArgumentExpression(nameof(expected))] string expectedExpression = "<expected-value>",
         [CallerArgumentExpression(nameof(itemsAreEqual))] string predicateExpression = "<predicate>")
     {
-        return AssertSequenceEqual(actual, expected, itemsAreEqual, message, actualExpression, expectedExpression,
+        return AssertSequenceEqual(actual, expected, itemsAreEqual, message, actualExpression,
             constraintExpression: $"Is.EqualTo({expectedExpression}).Using({predicateExpression})");
     }
 
@@ -600,11 +600,10 @@ public static class EnumerableAssertions
         Func<TActual, TExpected, bool> itemsAreEqual,
         NUnitString message,
         string actualExpression,
-        string expectedExpression,
         string constraintExpression) where T : IEnumerable<TActual>
     {
         actual.ShouldNotBeNull(valueExpression: actualExpression);
-        ArgumentNullException.ThrowIfNull(expected, expectedExpression);
+        ArgumentNullException.ThrowIfNull(expected);
         ArgumentNullException.ThrowIfNull(itemsAreEqual);
 
         var actualItems = actual.ToArray();
@@ -662,7 +661,7 @@ public static class EnumerableAssertions
         [CallerArgumentExpression(nameof(actual))] string actualExpression = "<some-value>",
         [CallerArgumentExpression(nameof(expected))] string expectedExpression = "<expected-value>") where T : IEnumerable<TItem>
     {
-        return AssertSetEqual<T, TItem>(actual, expected, comparer: null, message, actualExpression, expectedExpression,
+        return AssertSetEqual<T, TItem>(actual, expected, comparer: null, message, actualExpression,
             constraintExpression: $"Is.SetEqualTo({expectedExpression})");
     }
 
@@ -684,7 +683,7 @@ public static class EnumerableAssertions
         [CallerArgumentExpression(nameof(actual))] string actualExpression = "<some-value>",
         [CallerArgumentExpression(nameof(expected))] string expectedExpression = "<expected-value>")
     {
-        return AssertSetEqual<IEnumerable<T>, T>(actual, expected, comparer: null, message, actualExpression, expectedExpression,
+        return AssertSetEqual<IEnumerable<T>, T>(actual, expected, comparer: null, message, actualExpression,
             constraintExpression: $"Is.SetEqualTo({expectedExpression})");
     }
 
@@ -709,7 +708,7 @@ public static class EnumerableAssertions
     {
         ArgumentNullException.ThrowIfNull(comparer);
 
-        return AssertSetEqual<T, TItem>(actual, expected, comparer, message, actualExpression, expectedExpression,
+        return AssertSetEqual<T, TItem>(actual, expected, comparer, message, actualExpression,
             constraintExpression: $"Is.SetEqualTo({expectedExpression}).Using({comparerExpression})");
     }
 
@@ -719,11 +718,10 @@ public static class EnumerableAssertions
         IEqualityComparer<TItem>? comparer,
         NUnitString message,
         string actualExpression,
-        string expectedExpression,
         string constraintExpression) where T : IEnumerable<TItem>
     {
         actual.ShouldNotBeNull(valueExpression: actualExpression);
-        ArgumentNullException.ThrowIfNull(expected, expectedExpression);
+        ArgumentNullException.ThrowIfNull(expected);
 
         var itemComparer = comparer ?? FindSetComparer(actual) ?? FindSetComparer(expected);
         var actualSet = AsSet(actual, itemComparer);
@@ -792,7 +790,7 @@ public static class EnumerableAssertions
         [CallerArgumentExpression(nameof(actual))] string actualExpression = "<some-value>",
         [CallerArgumentExpression(nameof(expected))] string expectedExpression = "<expected-value>") where T : IEnumerable<TItem>
     {
-        return AssertMultisetEqual<T, TItem>(actual, expected, EqualityComparer<TItem>.Default, message, actualExpression, expectedExpression,
+        return AssertMultisetEqual<T, TItem>(actual, expected, EqualityComparer<TItem>.Default, message, actualExpression,
             constraintExpression: $"Is.EquivalentTo({expectedExpression})");
     }
 
@@ -810,7 +808,7 @@ public static class EnumerableAssertions
         [CallerArgumentExpression(nameof(actual))] string actualExpression = "<some-value>",
         [CallerArgumentExpression(nameof(expected))] string expectedExpression = "<expected-value>")
     {
-        return AssertMultisetEqual<IEnumerable<T>, T>(actual, expected, EqualityComparer<T>.Default, message, actualExpression, expectedExpression,
+        return AssertMultisetEqual<IEnumerable<T>, T>(actual, expected, EqualityComparer<T>.Default, message, actualExpression,
             constraintExpression: $"Is.EquivalentTo({expectedExpression})");
     }
 
@@ -833,7 +831,7 @@ public static class EnumerableAssertions
     {
         ArgumentNullException.ThrowIfNull(comparer);
 
-        return AssertMultisetEqual<T, TItem>(actual, expected, comparer, message, actualExpression, expectedExpression,
+        return AssertMultisetEqual<T, TItem>(actual, expected, comparer, message, actualExpression,
             constraintExpression: $"Is.EquivalentTo({expectedExpression}).Using({comparerExpression})");
     }
 
@@ -843,11 +841,10 @@ public static class EnumerableAssertions
         IEqualityComparer<TItem> comparer,
         NUnitString message,
         string actualExpression,
-        string expectedExpression,
         string constraintExpression) where T : IEnumerable<TItem>
     {
         actual.ShouldNotBeNull(valueExpression: actualExpression);
-        ArgumentNullException.ThrowIfNull(expected, expectedExpression);
+        ArgumentNullException.ThrowIfNull(expected);
 
         var actualItems = actual.ToArray();
         var expectedItems = expected.ToArray();
