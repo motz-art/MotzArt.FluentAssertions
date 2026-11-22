@@ -26,6 +26,26 @@ public class DictionaryAssertionsTests
     }
 
     [Test]
+    public void ShouldContainKey_ShouldFailForNullKey()
+    {
+        string missingKey = null!;
+        ShouldThrowAssertionException(() => ages.ShouldContainKey(missingKey))
+            .Message.ShouldBe($"""
+                                 Assert.That({nameof(ages)}, Does.ContainKey({nameof(missingKey)}))
+                                 Expected: dictionary containing key null
+                                 But was:  keys [Alice, Bob]
+
+                               """);
+    }
+
+    [Test]
+    public void ShouldNotContainKey_ShouldPassForNullKey()
+    {
+        string missingKey = null!;
+        ages.ShouldNotContainKey(missingKey).ShouldBeSameAs(ages);
+    }
+
+    [Test]
     public void ShouldContainKey_ShouldFailForEmptyDictionary()
     {
         var empty = new Dictionary<string, int>();
