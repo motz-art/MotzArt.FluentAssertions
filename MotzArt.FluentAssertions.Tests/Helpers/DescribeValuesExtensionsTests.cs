@@ -100,6 +100,12 @@ public class DescribeValuesExtensionsTests
         new ReadOnlySpan<string>(["aaa", "bbb", "ccc"]).DescribeValue(maxLength: 5).ShouldBe("[aaa, bbb, ...]");
     }
 
+    [Test]
+    public void DescribeValue_OfSpan_ShouldNotAddEllipsisWhenLastItemExceedsMaxLength()
+    {
+        new ReadOnlySpan<string>(["aaa", "bbb"]).DescribeValue(maxLength: 5).ShouldBe("[aaa, bbb]");
+    }
+
     [TestCase(typeof(int), "Int32")]
     [TestCase(typeof(int?), "Int32?")]
     [TestCase(typeof(int[]), "Int32[]")]

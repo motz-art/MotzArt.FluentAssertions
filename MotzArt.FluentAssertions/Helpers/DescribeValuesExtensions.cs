@@ -36,7 +36,9 @@ public static class DescribeValuesExtensions
             var item = span[i];
             sb.Append(DescribeValue(item));
 
-            if (sb.Length > maxLength)
+            var hasMoreItems = i < span.Length - 1;
+
+            if (sb.Length > maxLength && hasMoreItems)
             {
                 sb.Append(", ...");
                 break;
