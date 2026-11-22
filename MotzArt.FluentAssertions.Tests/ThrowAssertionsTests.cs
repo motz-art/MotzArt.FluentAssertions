@@ -156,6 +156,60 @@ public class ThrowAssertionsTests
     }
 
     [Test]
+    public void ShouldNotThrow_LetIgnoreExceptionThrough()
+    {
+        ShouldThrow<IgnoreException>(() => ShouldNotThrow(() => Assert.Ignore("Not applicable")))
+            .Message.ShouldBe("Not applicable");
+    }
+
+    [Test]
+    public void ShouldNotThrow_LetNestedAssertionFailureThrough()
+    {
+        ShouldThrowAssertionException(() => ShouldNotThrow(() => 1.ShouldBe(2)))
+            .Message.ShouldStartWith("  Assert.That(1, Is.EqualTo(");
+    }
+
+    [Test]
+    public void ShouldNotThrow_WithFunc_LetInconclusiveExceptionThrough()
+    {
+        Func<int> calculate = () =>
+        {
+            Assert.Inconclusive("Can't calculate");
+            return 42;
+        };
+
+        ShouldThrow<InconclusiveException>(() => calculate.ShouldNotThrow())
+            .Message.ShouldBe("Can't calculate");
+    }
+
+    [Test]
+    public async Task ShouldNotThrowAsync_LetIgnoreExceptionThrough()
+    {
+        AsyncTestDelegate ignore = async () =>
+        {
+            await Task.Yield();
+            Assert.Ignore("Not applicable");
+        };
+
+        (await ShouldThrowAsync<IgnoreException>(() => ShouldNotThrowAsync(ignore)))
+            .Message.ShouldBe("Not applicable");
+    }
+
+    [Test]
+    public async Task ShouldNotThrowAsync_WithResult_LetSuccessExceptionThrough()
+    {
+        Func<Task<int>> calculate = async () =>
+        {
+            await Task.Yield();
+            Assert.Pass("Already passed");
+            return 42;
+        };
+
+        (await ShouldThrowAsync<SuccessException>(() => calculate.ShouldNotThrowAsync()))
+            .Message.ShouldBe("Already passed");
+    }
+
+    [Test]
     public void ShouldNotThrow_Fluent_PassWhenNothingIsThrown()
     {
         Action act = () => { };

@@ -113,6 +113,7 @@ public static class ThrowAssertions
     /// </summary>
     /// <remarks>
     /// The failure message shows the thrown exception, which is also kept as the inner exception of the failure.
+    /// NUnit result exceptions, such as assertion failures or <see cref="Assert.Ignore(string)"/>, pass through unchanged.
     /// </remarks>
     /// <exception cref="ArgumentException">Thrown when <paramref name="code"/> is an async void lambda or method.</exception>
     public static void ShouldNotThrow(this Action code, NUnitString message = default, [CallerArgumentExpression(nameof(code))] string codeExpression = "")
@@ -127,6 +128,7 @@ public static class ThrowAssertions
     /// </summary>
     /// <remarks>
     /// The failure message shows the thrown exception, which is also kept as the inner exception of the failure.
+    /// NUnit result exceptions, such as assertion failures or <see cref="Assert.Ignore(string)"/>, pass through unchanged.
     /// </remarks>
     /// <exception cref="ArgumentException">Thrown when <paramref name="code"/> is an async void lambda or method.</exception>
     public static void ShouldNotThrow(TestDelegate code, NUnitString message = default, [CallerArgumentExpression(nameof(code))] string codeExpression = "")
@@ -139,7 +141,7 @@ public static class ThrowAssertions
         {
             code();
         }
-        catch (Exception exception)
+        catch (Exception exception) when (exception is not ResultStateException)
         {
             throw CreateExceptionThrownFailure(message, codeExpression, exception);
         }
@@ -150,6 +152,7 @@ public static class ThrowAssertions
     /// </summary>
     /// <remarks>
     /// The failure message shows the thrown exception, which is also kept as the inner exception of the failure.
+    /// NUnit result exceptions, such as assertion failures or <see cref="Assert.Ignore(string)"/>, pass through unchanged.
     /// </remarks>
     /// <returns>The result of <paramref name="code"/>, for chaining assertions on it.</returns>
     public static T ShouldNotThrow<T>(this Func<T> code, NUnitString message = default, [CallerArgumentExpression(nameof(code))] string codeExpression = "")
@@ -160,7 +163,7 @@ public static class ThrowAssertions
         {
             return code();
         }
-        catch (Exception exception)
+        catch (Exception exception) when (exception is not ResultStateException)
         {
             throw CreateExceptionThrownFailure(message, codeExpression, exception);
         }
@@ -193,6 +196,7 @@ public static class ThrowAssertions
     /// </summary>
     /// <remarks>
     /// The failure message shows the thrown exception, which is also kept as the inner exception of the failure.
+    /// NUnit result exceptions, such as assertion failures or <see cref="Assert.Ignore(string)"/>, pass through unchanged.
     /// </remarks>
     public static Task ShouldNotThrowAsync(this Func<Task> code, NUnitString message = default, [CallerArgumentExpression(nameof(code))] string codeExpression = "")
     {
@@ -204,6 +208,7 @@ public static class ThrowAssertions
     /// </summary>
     /// <remarks>
     /// The failure message shows the thrown exception, which is also kept as the inner exception of the failure.
+    /// NUnit result exceptions, such as assertion failures or <see cref="Assert.Ignore(string)"/>, pass through unchanged.
     /// </remarks>
     public static async Task ShouldNotThrowAsync(AsyncTestDelegate code, NUnitString message = default, [CallerArgumentExpression(nameof(code))] string codeExpression = "")
     {
@@ -213,7 +218,7 @@ public static class ThrowAssertions
         {
             await code();
         }
-        catch (Exception exception)
+        catch (Exception exception) when (exception is not ResultStateException)
         {
             throw CreateExceptionThrownFailure(message, codeExpression, exception);
         }
@@ -224,6 +229,7 @@ public static class ThrowAssertions
     /// </summary>
     /// <remarks>
     /// The failure message shows the thrown exception, which is also kept as the inner exception of the failure.
+    /// NUnit result exceptions, such as assertion failures or <see cref="Assert.Ignore(string)"/>, pass through unchanged.
     /// </remarks>
     /// <returns>The result of the task, for chaining assertions on it.</returns>
     public static async Task<T> ShouldNotThrowAsync<T>(this Func<Task<T>> code, NUnitString message = default, [CallerArgumentExpression(nameof(code))] string codeExpression = "")
@@ -234,7 +240,7 @@ public static class ThrowAssertions
         {
             return await code();
         }
-        catch (Exception exception)
+        catch (Exception exception) when (exception is not ResultStateException)
         {
             throw CreateExceptionThrownFailure(message, codeExpression, exception);
         }
