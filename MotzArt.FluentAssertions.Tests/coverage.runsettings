@@ -6,6 +6,7 @@
         <Configuration>
           <Format>cobertura</Format>
           <ExcludeByFile>**/JetBrains.Annotations/*.cs</ExcludeByFile>
+          <DoesNotReturnAttribute>DoesNotReturnAttribute</DoesNotReturnAttribute>
         </Configuration>
       </DataCollector>
     </DataCollectors>
