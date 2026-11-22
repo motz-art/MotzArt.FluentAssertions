@@ -114,13 +114,17 @@ public static class DescribeValuesExtensions
         if (type.IsGenericType)
         {
             var parameters = type.GetGenericArguments();
-            var typeName = type.Name;
-            typeName = typeName.Substring(0, typeName.LastIndexOf('`'));
 
-            return $"{typeName}<{string.Join(", ", parameters.Select(x => x.DescribeType()))}>";
+            return $"{RemoveGenericArity(type.Name)}<{string.Join(", ", parameters.Select(x => x.DescribeType()))}>";
         }
 
         return type.Name;
+    }
+
+    private static string RemoveGenericArity(string typeName)
+    {
+        var arityIndex = typeName.LastIndexOf('`');
+        return arityIndex < 0 ? typeName : typeName.Substring(0, arityIndex);
     }
 
     private static bool IsNullable(this Type type)
