@@ -1043,6 +1043,30 @@ public class EnumerableAssertionsTests
     }
 
     [Test]
+    public void ShouldBeMultisetEqualTo_WithComparer_ShouldPassForNullItems()
+    {
+        var actual = new[] { null, "A" };
+        actual.ShouldBeMultisetEqualTo(["a", null], StringComparer.OrdinalIgnoreCase);
+    }
+
+    [Test]
+    [MaxTime(5000)]
+    public void ShouldBeMultisetEqualTo_ShouldPassForLargeCollectionsInReverseOrderWithinFiveSeconds()
+    {
+        var actual = Enumerable.Range(0, 100_000).ToArray();
+        actual.ShouldBeMultisetEqualTo(actual.Reverse());
+    }
+
+    [Test]
+    public void ShouldBeMultisetEqualTo_ShouldListMissingItemsInExpectedOrder()
+    {
+        var actual = new[] { 1 };
+        var expected = new[] { 3, 1, 2, 3 };
+        ShouldThrowAssertionException(() => actual.ShouldBeMultisetEqualTo(expected))
+            .Message.ShouldContain("Missing items: [3, 2, 3]");
+    }
+
+    [Test]
     public void ShouldBeMultisetEqualTo_ShouldFailWhenDuplicateIsMissing()
     {
         var actual = new[] { 1, 2 };

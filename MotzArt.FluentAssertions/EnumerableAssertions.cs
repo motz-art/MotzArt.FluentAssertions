@@ -864,24 +864,18 @@ public static class EnumerableAssertions
 
     private static (TItem[] MissingItems, TItem[] ExtraItems) FindUnmatchedItems<TItem>(TItem[] actualItems, TItem[] expectedItems, IEqualityComparer<TItem> comparer)
     {
-        var missingItems = new List<TItem>(expectedItems);
-        var extraItems = new List<TItem>();
+        var unmatchedExpectedItems = new ItemCounter<TItem>(expectedItems, comparer);
+        var extraItems = actualItems.Where(item => !unmatchedExpectedItems.TryRemove(item)).ToArray();
+        var missingItems = TakeLastCountedOccurrences(expectedItems, unmatchedExpectedItems);
 
-        foreach (var item in actualItems)
-        {
-            var missingIndex = missingItems.FindIndex(x => comparer.Equals(x, item));
+        return (missingItems, extraItems);
+    }
 
-            if (missingIndex < 0)
-            {
-                extraItems.Add(item);
-            }
-            else
-            {
-                missingItems.RemoveAt(missingIndex);
-            }
-        }
-
-        return (missingItems.ToArray(), extraItems.ToArray());
+    private static TItem[] TakeLastCountedOccurrences<TItem>(TItem[] items, ItemCounter<TItem> counter)
+    {
+        var lastOccurrences = Enumerable.Reverse(items).Where(counter.TryRemove).ToArray();
+        Array.Reverse(lastOccurrences);
+        return lastOccurrences;
     }
 
     [DoesNotReturn]
