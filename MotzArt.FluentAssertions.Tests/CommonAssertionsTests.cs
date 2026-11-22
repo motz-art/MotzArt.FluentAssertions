@@ -239,7 +239,7 @@ public class CommonAssertionsTests
         object value = DataProvider.DefaultTestClass;
         TestHelpers.ShouldThrowAssertionException(() => value.ShouldBeOfType<string>())
             .Message.ShouldBe($"""
-                                 Assert.That({nameof(value)}, Is.InstanceOf<String>())
+                                 Assert.That({nameof(value)}, Is.InstanceOf<string>())
                                  Expected: instance of <System.String>
                                  But was:  <MotzArt.FluentAssertions.Tests.TestData.TestClass>
                                
@@ -252,7 +252,7 @@ public class CommonAssertionsTests
         object? value = null;
         TestHelpers.ShouldThrowAssertionException(() => value.ShouldBeOfType<string>())
             .Message.ShouldBe($"""
-                                 Assert.That({nameof(value)}, Is.InstanceOf<String>())
+                                 Assert.That({nameof(value)}, Is.InstanceOf<string>())
                                  Expected: instance of <System.String>
                                  But was:  null
                                
@@ -273,7 +273,7 @@ public class CommonAssertionsTests
         object value = DataProvider.DefaultTestClass;
         TestHelpers.ShouldThrowAssertionException(() => value.ShouldBeOfType(typeof(string)))
             .Message.ShouldBe($"""
-                                 Assert.That({nameof(value)}, Is.InstanceOf(String))
+                                 Assert.That({nameof(value)}, Is.InstanceOf(typeof(string)))
                                  Expected: instance of <System.String>
                                  But was:  <MotzArt.FluentAssertions.Tests.TestData.TestClass>
 
@@ -286,7 +286,7 @@ public class CommonAssertionsTests
         object? value = null;
         TestHelpers.ShouldThrowAssertionException(() => value.ShouldBeOfType(typeof(string)))
             .Message.ShouldBe($"""
-                                 Assert.That({nameof(value)}, Is.InstanceOf(String))
+                                 Assert.That({nameof(value)}, Is.InstanceOf(typeof(string)))
                                  Expected: instance of <System.String>
                                  But was:  null
 
@@ -338,7 +338,7 @@ public class CommonAssertionsTests
         object value = DataProvider.DefaultTestClass;
         TestHelpers.ShouldThrowAssertionException(() => value.ShouldNotBeOfType(typeof(TestClass)))
             .Message.ShouldBe($"""
-                                 Assert.That({nameof(value)}, Is.Not.InstanceOf(TestClass))
+                                 Assert.That({nameof(value)}, Is.Not.InstanceOf(typeof(TestClass)))
                                  Expected: not instance of <MotzArt.FluentAssertions.Tests.TestData.TestClass>
                                  But was:  <MotzArt.FluentAssertions.Tests.TestData.TestClass>
 

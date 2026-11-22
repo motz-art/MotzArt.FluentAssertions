@@ -13,6 +13,28 @@ public static class DescribeValuesExtensions
 {
     private static IFormatProvider FormatProvider => CultureInfo.InvariantCulture;
 
+    private static readonly Dictionary<Type, string> CSharpKeywordsByType = new()
+    {
+        [typeof(bool)] = "bool",
+        [typeof(byte)] = "byte",
+        [typeof(sbyte)] = "sbyte",
+        [typeof(char)] = "char",
+        [typeof(short)] = "short",
+        [typeof(ushort)] = "ushort",
+        [typeof(int)] = "int",
+        [typeof(uint)] = "uint",
+        [typeof(long)] = "long",
+        [typeof(ulong)] = "ulong",
+        [typeof(nint)] = "nint",
+        [typeof(nuint)] = "nuint",
+        [typeof(float)] = "float",
+        [typeof(double)] = "double",
+        [typeof(decimal)] = "decimal",
+        [typeof(object)] = "object",
+        [typeof(string)] = "string",
+        [typeof(void)] = "void",
+    };
+
     /// <summary>
     /// Describes the items of <paramref name="span"/> starting at <paramref name="skip"/>, e.g. <c>[1, 2, 3]</c>,
     /// or <c>[..., 2, 3]</c> when items are skipped. The description is cut after about <paramref name="maxLength"/> characters.
@@ -120,7 +142,7 @@ public static class DescribeValuesExtensions
             return $"{RemoveGenericArity(type.Name)}<{string.Join(", ", parameters.Select(x => x.DescribeType()))}>";
         }
 
-        return type.Name;
+        return CSharpKeywordsByType.TryGetValue(type, out var keyword) ? keyword : type.Name;
     }
 
     private static string RemoveGenericArity(string typeName)

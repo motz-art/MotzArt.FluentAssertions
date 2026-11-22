@@ -20,7 +20,7 @@ public class ReadOnlySpanAssertionsTests
             })
             .Message.ShouldBe($"""
                                  Assert.That(span, Is.Empty)
-                                 Expected: empty ReadOnlySpan<Int32>
+                                 Expected: empty ReadOnlySpan<int>
                                  But was:  [1, 2, 3]
 
                                """);
@@ -45,8 +45,8 @@ public class ReadOnlySpanAssertionsTests
             })
             .Message.ShouldBe($"""
                                  Assert.That(span, Is.Not.Empty)
-                                 Expected: not empty ReadOnlySpan<Int32>
-                                 But was:  empty <ReadOnlySpan<Int32>>
+                                 Expected: not empty ReadOnlySpan<int>
+                                 But was:  empty <ReadOnlySpan<int>>
 
                                """);
     }

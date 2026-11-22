@@ -79,7 +79,7 @@ public class DescribeValuesExtensionsTests
     [Test]
     public void DescribeValue_OfSpan_ShouldDescribeEmptySpanWithItsType()
     {
-        ReadOnlySpan<int>.Empty.DescribeValue().ShouldBe("empty <ReadOnlySpan<Int32>>");
+        ReadOnlySpan<int>.Empty.DescribeValue().ShouldBe("empty <ReadOnlySpan<int>>");
     }
 
     [Test]
@@ -106,15 +106,18 @@ public class DescribeValuesExtensionsTests
         new ReadOnlySpan<string>(["aaa", "bbb"]).DescribeValue(maxLength: 5).ShouldBe("[aaa, bbb]");
     }
 
-    [TestCase(typeof(int), "Int32")]
-    [TestCase(typeof(int?), "Int32?")]
-    [TestCase(typeof(int[]), "Int32[]")]
-    [TestCase(typeof(int[][]), "Int32[][]")]
-    [TestCase(typeof(int[,]), "Int32[,]")]
-    [TestCase(typeof(int?[]), "Int32?[]")]
-    [TestCase(typeof(List<int>), "List<Int32>")]
-    [TestCase(typeof(Dictionary<string, List<int?>>), "Dictionary<String, List<Int32?>>")]
-    [TestCase(typeof(Dictionary<int, string>.KeyCollection), "KeyCollection<Int32, String>")]
+    [TestCase(typeof(int), "int")]
+    [TestCase(typeof(int?), "int?")]
+    [TestCase(typeof(int[]), "int[]")]
+    [TestCase(typeof(int[][]), "int[][]")]
+    [TestCase(typeof(int[,]), "int[,]")]
+    [TestCase(typeof(int?[]), "int?[]")]
+    [TestCase(typeof(string), "string")]
+    [TestCase(typeof(object), "object")]
+    [TestCase(typeof(TimeSpan), "TimeSpan")]
+    [TestCase(typeof(List<int>), "List<int>")]
+    [TestCase(typeof(Dictionary<string, List<int?>>), "Dictionary<string, List<int?>>")]
+    [TestCase(typeof(Dictionary<int, string>.KeyCollection), "KeyCollection<int, string>")]
     public void DescribeType_ShouldDescribeTypeAsInCSharpSource(Type type, string expected)
     {
         type.DescribeType().ShouldBe(expected);
