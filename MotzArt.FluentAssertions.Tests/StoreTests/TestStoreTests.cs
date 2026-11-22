@@ -154,6 +154,24 @@ namespace MotzArt.FluentAssertions.Tests.StoreTests
             }
 
             [Test]
+            public void GetOrCreate_ShouldCreateAndStoreValueWhenKeyIsMissing()
+            {
+                const string key = "GetOrCreateKey";
+
+                TestStore.GetOrCreate(key, x => x + " value").ShouldBe("GetOrCreateKey value");
+
+                TestStore.TryGet(key, out string value).ShouldBeTrue();
+                value.ShouldBe("GetOrCreateKey value");
+            }
+
+            [Test]
+            public void GetOrCreate_ShouldReturnValueOfFixtureWithoutCreatingNewOne()
+            {
+                TestStore.GetOrCreate<string>(OneTimeSetupName, _ => throw new InvalidOperationException("Value should not be created."))
+                    .ShouldBe(FixtureScopeValue);
+            }
+
+            [Test]
             public void Remove_ShouldNotRemoveValueOfFixture()
             {
                 TestStore.Remove(OneTimeSetupName).ShouldBeFalse();
