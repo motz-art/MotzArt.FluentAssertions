@@ -355,6 +355,7 @@ public static class EnumerableAssertions
     /// <remarks>
     /// Every item is checked, even after a failure. The failure message lists each failing item with its index and the message
     /// of its failed assertion (or the exception it threw), up to 10 items.
+    /// Other NUnit result exceptions, such as from <see cref="Assert.Ignore(string)"/>, stop the check and pass through unchanged.
     /// </remarks>
     /// <returns>The asserted collection, for chaining further assertions.</returns>
     [return: NotNull]
@@ -374,6 +375,7 @@ public static class EnumerableAssertions
     /// <remarks>
     /// Every item is checked, even after a failure. The failure message lists each failing item with its index and the message
     /// of its failed assertion (or the exception it threw), up to 10 items.
+    /// Other NUnit result exceptions, such as from <see cref="Assert.Ignore(string)"/>, stop the check and pass through unchanged.
     /// </remarks>
     /// <returns>The asserted sequence, for chaining further assertions.</returns>
     [return: NotNull]
@@ -434,11 +436,11 @@ public static class EnumerableAssertions
             assertion(item);
             return null;
         }
-        catch (ResultStateException exception)
+        catch (Exception exception) when (exception is AssertionException or MultipleAssertException)
         {
             return exception.Message;
         }
-        catch (Exception exception)
+        catch (Exception exception) when (exception is not ResultStateException)
         {
             return $"<{exception.GetType().FullName}: {exception.Message}>";
         }

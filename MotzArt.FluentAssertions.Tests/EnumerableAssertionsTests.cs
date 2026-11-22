@@ -648,6 +648,19 @@ public class EnumerableAssertionsTests
     }
 
     [Test]
+    public void ShouldAllSatisfy_ShouldLetIgnoreExceptionThrough()
+    {
+        var numbers = new[] { 1, 2 };
+        ShouldThrow<IgnoreException>(() => numbers.ShouldAllSatisfy(x => IgnoreIfEven(x)))
+            .Message.ShouldBe("2 is even.");
+    }
+
+    private static void IgnoreIfEven(int number)
+    {
+        if (number % 2 == 0) Assert.Ignore($"{number} is even.");
+    }
+
+    [Test]
     public void ShouldAllSatisfy_ShouldReportOnlyFirstTenFailures()
     {
         var numbers = Enumerable.Range(1, 12).ToArray();
