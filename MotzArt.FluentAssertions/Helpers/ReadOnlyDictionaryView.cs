@@ -1,3 +1,4 @@
+#if NET9_0_OR_GREATER
 using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 
@@ -21,3 +22,4 @@ internal sealed class ReadOnlyDictionaryView<TKey, TValue>(IDictionary<TKey, TVa
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }
+#endif

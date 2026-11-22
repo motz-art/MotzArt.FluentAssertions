@@ -217,7 +217,7 @@ public class EnumerableAssertionsTests
 
 ### Dictionary Assertions
 
-Assert dictionary keys and values of `Dictionary<TKey, TValue>`, `IDictionary<TKey, TValue>` or `IReadOnlyDictionary<TKey, TValue>`. For other dictionary types, such as `SortedDictionary<TKey, TValue>`, cast the value to one of these interfaces:
+Assert dictionary keys and values of any type that implements `IReadOnlyDictionary<TKey, TValue>` or, on .NET 10 and later, `IDictionary<TKey, TValue>`. On .NET 8, cast an `IDictionary<TKey, TValue>` to `IReadOnlyDictionary<TKey, TValue>`, or wrap it with `AsReadOnly()` when it doesn't implement that interface:
 
 ``` C#
 [TestFixture]

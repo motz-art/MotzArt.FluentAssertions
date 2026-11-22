@@ -6,14 +6,24 @@ using static MotzArt.FluentAssertions.Helpers.MessageUtils;
 
 namespace MotzArt.FluentAssertions;
 
+#if NET9_0_OR_GREATER
 /// <summary>
 /// Assertions for the keys and values of <see cref="IReadOnlyDictionary{TKey, TValue}"/>, <see cref="IDictionary{TKey, TValue}"/>
 /// and <see cref="Dictionary{TKey, TValue}"/> instances.
 /// </summary>
 /// <remarks>
-/// For other types that implement both <see cref="IReadOnlyDictionary{TKey, TValue}"/> and <see cref="IDictionary{TKey, TValue}"/>,
-/// such as <see cref="SortedDictionary{TKey, TValue}"/>, cast the value to one of these interfaces.
+/// For types that implement both interfaces, such as <see cref="SortedDictionary{TKey, TValue}"/>, the
+/// <see cref="IReadOnlyDictionary{TKey, TValue}"/> overloads are chosen. This requires C# 13 or later.
 /// </remarks>
+#else
+/// <summary>
+/// Assertions for the keys and values of <see cref="IReadOnlyDictionary{TKey, TValue}"/> and <see cref="Dictionary{TKey, TValue}"/> instances.
+/// </summary>
+/// <remarks>
+/// Overloads for <see cref="IDictionary{TKey, TValue}"/> require .NET 10 or later. On .NET 8, cast an <see cref="IDictionary{TKey, TValue}"/>
+/// to <see cref="IReadOnlyDictionary{TKey, TValue}"/>, or wrap it with <c>AsReadOnly()</c> when it doesn't implement that interface.
+/// </remarks>
+#endif
 public static class DictionaryAssertions
 {
     /// <summary>
@@ -33,19 +43,6 @@ public static class DictionaryAssertions
         actual.ShouldNotBeNull(valueExpression: actualExpression);
 
         return AssertContainsKey(actual, key, message, actualExpression, keyExpression);
-    }
-
-    /// <inheritdoc cref="ShouldContainKey{TKey, TValue}(IReadOnlyDictionary{TKey, TValue}, TKey, NUnitString, string, string)"/>
-    public static TValue ShouldContainKey<TKey, TValue>(
-        [NotNull] this IDictionary<TKey, TValue>? actual,
-        TKey key,
-        NUnitString message = default,
-        [CallerArgumentExpression(nameof(actual))] string actualExpression = "<some-value>",
-        [CallerArgumentExpression(nameof(key))] string keyExpression = "<key>")
-    {
-        actual.ShouldNotBeNull(valueExpression: actualExpression);
-
-        return AssertContainsKey(new ReadOnlyDictionaryView<TKey, TValue>(actual), key, message, actualExpression, keyExpression);
     }
 
     /// <inheritdoc cref="ShouldContainKey{TKey, TValue}(IReadOnlyDictionary{TKey, TValue}, TKey, NUnitString, string, string)"/>
@@ -84,21 +81,6 @@ public static class DictionaryAssertions
 
     /// <inheritdoc cref="ShouldNotContainKey{TKey, TValue}(IReadOnlyDictionary{TKey, TValue}, TKey, NUnitString, string, string)"/>
     [return: NotNull]
-    public static IDictionary<TKey, TValue> ShouldNotContainKey<TKey, TValue>(
-        [NotNull] this IDictionary<TKey, TValue>? actual,
-        TKey key,
-        NUnitString message = default,
-        [CallerArgumentExpression(nameof(actual))] string actualExpression = "<some-value>",
-        [CallerArgumentExpression(nameof(key))] string keyExpression = "<key>")
-    {
-        actual.ShouldNotBeNull(valueExpression: actualExpression);
-
-        AssertDoesNotContainKey(new ReadOnlyDictionaryView<TKey, TValue>(actual), key, message, actualExpression, keyExpression);
-        return actual;
-    }
-
-    /// <inheritdoc cref="ShouldNotContainKey{TKey, TValue}(IReadOnlyDictionary{TKey, TValue}, TKey, NUnitString, string, string)"/>
-    [return: NotNull]
     public static Dictionary<TKey, TValue> ShouldNotContainKey<TKey, TValue>(
         [NotNull] this Dictionary<TKey, TValue>? actual,
         TKey key,
@@ -127,21 +109,6 @@ public static class DictionaryAssertions
         actual.ShouldNotBeNull(valueExpression: actualExpression);
 
         AssertContainsValue(actual, value, message, actualExpression, valueExpression);
-        return actual;
-    }
-
-    /// <inheritdoc cref="ShouldContainValue{TKey, TValue}(IReadOnlyDictionary{TKey, TValue}, TValue, NUnitString, string, string)"/>
-    [return: NotNull]
-    public static IDictionary<TKey, TValue> ShouldContainValue<TKey, TValue>(
-        [NotNull] this IDictionary<TKey, TValue>? actual,
-        TValue value,
-        NUnitString message = default,
-        [CallerArgumentExpression(nameof(actual))] string actualExpression = "<some-value>",
-        [CallerArgumentExpression(nameof(value))] string valueExpression = "<value>")
-    {
-        actual.ShouldNotBeNull(valueExpression: actualExpression);
-
-        AssertContainsValue(new ReadOnlyDictionaryView<TKey, TValue>(actual), value, message, actualExpression, valueExpression);
         return actual;
     }
 
@@ -180,21 +147,6 @@ public static class DictionaryAssertions
 
     /// <inheritdoc cref="ShouldNotContainValue{TKey, TValue}(IReadOnlyDictionary{TKey, TValue}, TValue, NUnitString, string, string)"/>
     [return: NotNull]
-    public static IDictionary<TKey, TValue> ShouldNotContainValue<TKey, TValue>(
-        [NotNull] this IDictionary<TKey, TValue>? actual,
-        TValue value,
-        NUnitString message = default,
-        [CallerArgumentExpression(nameof(actual))] string actualExpression = "<some-value>",
-        [CallerArgumentExpression(nameof(value))] string valueExpression = "<value>")
-    {
-        actual.ShouldNotBeNull(valueExpression: actualExpression);
-
-        AssertDoesNotContainValue(new ReadOnlyDictionaryView<TKey, TValue>(actual), value, message, actualExpression, valueExpression);
-        return actual;
-    }
-
-    /// <inheritdoc cref="ShouldNotContainValue{TKey, TValue}(IReadOnlyDictionary{TKey, TValue}, TValue, NUnitString, string, string)"/>
-    [return: NotNull]
     public static Dictionary<TKey, TValue> ShouldNotContainValue<TKey, TValue>(
         [NotNull] this Dictionary<TKey, TValue>? actual,
         TValue value,
@@ -207,6 +159,70 @@ public static class DictionaryAssertions
         AssertDoesNotContainValue(actual, value, message, actualExpression, valueExpression);
         return actual;
     }
+
+#if NET9_0_OR_GREATER
+    /// <inheritdoc cref="ShouldContainKey{TKey, TValue}(IReadOnlyDictionary{TKey, TValue}, TKey, NUnitString, string, string)"/>
+    [OverloadResolutionPriority(-1)]
+    public static TValue ShouldContainKey<TKey, TValue>(
+        [NotNull] this IDictionary<TKey, TValue>? actual,
+        TKey key,
+        NUnitString message = default,
+        [CallerArgumentExpression(nameof(actual))] string actualExpression = "<some-value>",
+        [CallerArgumentExpression(nameof(key))] string keyExpression = "<key>")
+    {
+        actual.ShouldNotBeNull(valueExpression: actualExpression);
+
+        return AssertContainsKey(new ReadOnlyDictionaryView<TKey, TValue>(actual), key, message, actualExpression, keyExpression);
+    }
+
+    /// <inheritdoc cref="ShouldNotContainKey{TKey, TValue}(IReadOnlyDictionary{TKey, TValue}, TKey, NUnitString, string, string)"/>
+    [OverloadResolutionPriority(-1)]
+    [return: NotNull]
+    public static IDictionary<TKey, TValue> ShouldNotContainKey<TKey, TValue>(
+        [NotNull] this IDictionary<TKey, TValue>? actual,
+        TKey key,
+        NUnitString message = default,
+        [CallerArgumentExpression(nameof(actual))] string actualExpression = "<some-value>",
+        [CallerArgumentExpression(nameof(key))] string keyExpression = "<key>")
+    {
+        actual.ShouldNotBeNull(valueExpression: actualExpression);
+
+        AssertDoesNotContainKey(new ReadOnlyDictionaryView<TKey, TValue>(actual), key, message, actualExpression, keyExpression);
+        return actual;
+    }
+
+    /// <inheritdoc cref="ShouldContainValue{TKey, TValue}(IReadOnlyDictionary{TKey, TValue}, TValue, NUnitString, string, string)"/>
+    [OverloadResolutionPriority(-1)]
+    [return: NotNull]
+    public static IDictionary<TKey, TValue> ShouldContainValue<TKey, TValue>(
+        [NotNull] this IDictionary<TKey, TValue>? actual,
+        TValue value,
+        NUnitString message = default,
+        [CallerArgumentExpression(nameof(actual))] string actualExpression = "<some-value>",
+        [CallerArgumentExpression(nameof(value))] string valueExpression = "<value>")
+    {
+        actual.ShouldNotBeNull(valueExpression: actualExpression);
+
+        AssertContainsValue(new ReadOnlyDictionaryView<TKey, TValue>(actual), value, message, actualExpression, valueExpression);
+        return actual;
+    }
+
+    /// <inheritdoc cref="ShouldNotContainValue{TKey, TValue}(IReadOnlyDictionary{TKey, TValue}, TValue, NUnitString, string, string)"/>
+    [OverloadResolutionPriority(-1)]
+    [return: NotNull]
+    public static IDictionary<TKey, TValue> ShouldNotContainValue<TKey, TValue>(
+        [NotNull] this IDictionary<TKey, TValue>? actual,
+        TValue value,
+        NUnitString message = default,
+        [CallerArgumentExpression(nameof(actual))] string actualExpression = "<some-value>",
+        [CallerArgumentExpression(nameof(value))] string valueExpression = "<value>")
+    {
+        actual.ShouldNotBeNull(valueExpression: actualExpression);
+
+        AssertDoesNotContainValue(new ReadOnlyDictionaryView<TKey, TValue>(actual), value, message, actualExpression, valueExpression);
+        return actual;
+    }
+#endif
 
     private static TValue AssertContainsKey<TKey, TValue>(
         IReadOnlyDictionary<TKey, TValue> actual,

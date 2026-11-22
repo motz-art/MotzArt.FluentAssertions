@@ -164,6 +164,21 @@ public class DictionaryAssertionsTests
     }
 
     [Test]
+    public void Overloads_ShouldAcceptSortedDictionaryWithoutCast()
+    {
+        var sortedAges = new SortedDictionary<string, int>(ages);
+
+        IReadOnlyDictionary<string, int> result = sortedAges
+            .ShouldNotContainKey("Carol")
+            .ShouldContainValue(30)
+            .ShouldNotContainValue(40);
+
+        result.ShouldBeSameAs(sortedAges);
+        sortedAges.ShouldContainKey("Bob").ShouldBe(25);
+    }
+
+#if NET9_0_OR_GREATER
+    [Test]
     public void IDictionaryOverloads_ShouldPassAndReturnSourceForChaining()
     {
         IDictionary<string, int> dictionary = ages;
@@ -226,4 +241,5 @@ public class DictionaryAssertionsTests
 
                                """);
     }
+#endif
 }
