@@ -132,7 +132,7 @@ public static class DescribeValuesExtensions
 
         if (type.IsArray)
         {
-            return type.GetElementType().EnsureNotNull().DescribeType() + "[" + new string(',', type.GetArrayRank() - 1) + "]";
+            return DescribeArrayType(type);
         }
 
         if (type.IsGenericType)
@@ -141,6 +141,20 @@ public static class DescribeValuesExtensions
         }
 
         return CSharpKeywordsByType.TryGetValue(type, out var keyword) ? keyword : type.Name;
+    }
+
+    private static string DescribeArrayType(Type arrayType)
+    {
+        var rankSpecifiers = new StringBuilder();
+        var elementType = arrayType;
+
+        while (elementType.IsArray)
+        {
+            rankSpecifiers.Append('[').Append(',', elementType.GetArrayRank() - 1).Append(']');
+            elementType = elementType.GetElementType().EnsureNotNull();
+        }
+
+        return elementType.DescribeType() + rankSpecifiers;
     }
 
     private static string DescribeGenericType(Type type, Type[] typeArguments)
