@@ -1,3 +1,4 @@
+using System.Reflection;
 using static MotzArt.FluentAssertions.Tests.TestHelpers;
 using static MotzArt.FluentAssertions.ThrowAssertions;
 
@@ -178,6 +179,40 @@ public class ThrowAssertionsTests
                                  Expected: no exception
                                  But was:  <System.InvalidOperationException: Test exception
                                """);
+    }
+
+    [Test]
+    public void ShouldNotThrow_RejectAsyncVoidLambda()
+    {
+        var exception = ShouldThrow<ArgumentException>(() => ShouldNotThrow(async () => await Task.Yield()));
+
+        exception.Message.ShouldStartWith("ShouldNotThrow can't await async code");
+    }
+
+    [Test]
+    public void ShouldNotThrow_Fluent_RejectAsyncVoidAction()
+    {
+        Action act = async () => await Task.Yield();
+
+        var exception = ShouldThrow<ArgumentException>(() => act.ShouldNotThrow());
+
+        exception.Message.ShouldStartWith("ShouldNotThrow can't await async code");
+    }
+
+    [Test]
+    public void ShouldNotThrow_OverloadsForTaskReturningCode_AreObsoleteAsErrors()
+    {
+        var taskReturningOverloads = typeof(ThrowAssertions).GetMethods()
+            .Where(x => x.Name == nameof(ShouldNotThrow) && ReturnsTask(x.GetParameters()[0].ParameterType))
+            .ToArray();
+
+        taskReturningOverloads.Length.ShouldBe(2);
+        taskReturningOverloads.ShouldAllSatisfy(x => x.GetCustomAttribute<ObsoleteAttribute>().ShouldNotBeNull().IsError.ShouldBeTrue());
+    }
+
+    private static bool ReturnsTask(Type delegateType)
+    {
+        return typeof(Task).IsAssignableFrom(delegateType.GetMethod(nameof(Action.Invoke))!.ReturnType);
     }
 
     [Test]

@@ -16,6 +16,8 @@ namespace MotzArt.FluentAssertions;
 /// </remarks>
 public static class ThrowAssertions
 {
+    private const string AsyncCodeIsNotSupportedMessage = "ShouldNotThrow can't await async code, so its failure would go unnoticed. Use ShouldNotThrowAsync instead.";
+
     /// <summary>
     /// Asserts that <paramref name="code"/> throws <typeparamref name="TException"/> or an exception derived from it.
     /// </summary>
@@ -112,8 +114,11 @@ public static class ThrowAssertions
     /// <remarks>
     /// The failure message shows the thrown exception, which is also kept as the inner exception of the failure.
     /// </remarks>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="code"/> is an async void lambda or method.</exception>
     public static void ShouldNotThrow(this Action code, NUnitString message = default, [CallerArgumentExpression(nameof(code))] string codeExpression = "")
     {
+        EnsureNotAsyncVoid(code);
+
         ShouldNotThrow((TestDelegate)(() => code()), message, codeExpression);
     }
 
@@ -123,8 +128,11 @@ public static class ThrowAssertions
     /// <remarks>
     /// The failure message shows the thrown exception, which is also kept as the inner exception of the failure.
     /// </remarks>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="code"/> is an async void lambda or method.</exception>
     public static void ShouldNotThrow(TestDelegate code, NUnitString message = default, [CallerArgumentExpression(nameof(code))] string codeExpression = "")
     {
+        EnsureNotAsyncVoid(code);
+
         using var ctx = new TestExecutionContext.IsolatedContext();
 
         try
@@ -156,6 +164,28 @@ public static class ThrowAssertions
         {
             throw CreateExceptionThrownFailure(message, codeExpression, exception);
         }
+    }
+
+    /// <summary>
+    /// Not supported: the task returned by <paramref name="code"/> wouldn't be awaited, so its failure would go unnoticed.
+    /// Use <see cref="ShouldNotThrowAsync(Func{Task}, NUnitString, string)"/> instead.
+    /// </summary>
+    /// <exception cref="NotSupportedException">Always thrown.</exception>
+    [Obsolete(AsyncCodeIsNotSupportedMessage, error: true)]
+    public static void ShouldNotThrow(this Func<Task> code, NUnitString message = default, [CallerArgumentExpression(nameof(code))] string codeExpression = "")
+    {
+        throw new NotSupportedException(AsyncCodeIsNotSupportedMessage);
+    }
+
+    /// <summary>
+    /// Not supported: the task returned by <paramref name="code"/> wouldn't be awaited, so its failure would go unnoticed.
+    /// Use <see cref="ShouldNotThrowAsync{T}(Func{Task{T}}, NUnitString, string)"/> instead.
+    /// </summary>
+    /// <exception cref="NotSupportedException">Always thrown.</exception>
+    [Obsolete(AsyncCodeIsNotSupportedMessage, error: true)]
+    public static T ShouldNotThrow<T>(this Func<Task<T>> code, NUnitString message = default, [CallerArgumentExpression(nameof(code))] string codeExpression = "")
+    {
+        throw new NotSupportedException(AsyncCodeIsNotSupportedMessage);
     }
 
     /// <summary>
@@ -207,6 +237,14 @@ public static class ThrowAssertions
         catch (Exception exception)
         {
             throw CreateExceptionThrownFailure(message, codeExpression, exception);
+        }
+    }
+
+    private static void EnsureNotAsyncVoid(Delegate code)
+    {
+        if (code.Method.IsDefined(typeof(AsyncStateMachineAttribute), inherit: false))
+        {
+            throw new ArgumentException(AsyncCodeIsNotSupportedMessage, nameof(code));
         }
     }
 
