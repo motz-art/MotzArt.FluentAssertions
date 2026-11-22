@@ -864,6 +864,7 @@ public static class EnumerableAssertions
         return (missingItems.ToArray(), extraItems.ToArray());
     }
 
+    [DoesNotReturn]
     private static void ReportUnmatchedItems<TItem>(
         TItem[] actualItems,
         TItem[] expectedItems,
