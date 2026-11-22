@@ -96,6 +96,31 @@ public class ThrowAssertionsTests
     }
 
     [Test]
+    public async Task ShouldThrowAsync_ShouldUnwrapAggregateExceptionWithSingleExpectedException()
+    {
+        AsyncTestDelegate throwsAggregateException = () => Task.FromException(new AggregateException(new InvalidOperationException(TestExceptionMessage)));
+
+        var exception = await ShouldThrowAsync<InvalidOperationException>(throwsAggregateException);
+
+        exception.Message.ShouldBe(TestExceptionMessage);
+    }
+
+    [Test]
+    public async Task ShouldThrowAsync_FailWhenAggregateExceptionHasSeveralInnerExceptions()
+    {
+        AsyncTestDelegate throwsAggregateException = () => Task.FromException(new AggregateException(new InvalidOperationException(), new InvalidOperationException()));
+
+        (await ShouldThrowAssertionExceptionAsync(async () =>
+        {
+            await ShouldThrowAsync<InvalidOperationException>(throwsAggregateException);
+        })).Message.ShouldStartWith($"""
+                               Assert.That({nameof(throwsAggregateException)}, Throws.TypeOf<InvalidOperationException>())
+                               Expected: <System.InvalidOperationException>
+                               But was:  <System.AggregateException:
+                             """);
+    }
+
+    [Test]
     public void ShouldNotThrow_PassWhenNothingIsThrown()
     {
         ShouldNotThrow(willThrowNoException);
