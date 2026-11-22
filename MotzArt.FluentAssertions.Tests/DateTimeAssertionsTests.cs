@@ -145,6 +145,12 @@ public class DateTimeAssertionsTests
     }
 
     [Test]
+    public void ShouldBeAfter_WithDateTimeOffset_ShouldPassAndReturnValueForLaterDate()
+    {
+        NewYearOffset.ShouldBeAfter(NewYearEveOffset).ShouldBe(NewYearOffset);
+    }
+
+    [Test]
     public void ShouldBeAfter_WithDateTimeOffset_ShouldFailForEarlierDate()
     {
         var date = NewYearEveOffset;
