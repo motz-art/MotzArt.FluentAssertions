@@ -137,12 +137,31 @@ public static class DescribeValuesExtensions
 
         if (type.IsGenericType)
         {
-            var parameters = type.GetGenericArguments();
-
-            return $"{RemoveGenericArity(type.Name)}<{string.Join(", ", parameters.Select(x => x.DescribeType()))}>";
+            return DescribeGenericType(type, type.GetGenericArguments());
         }
 
         return CSharpKeywordsByType.TryGetValue(type, out var keyword) ? keyword : type.Name;
+    }
+
+    private static string DescribeGenericType(Type type, Type[] typeArguments)
+    {
+        var declaringType = type.DeclaringType;
+        var declaringTypeArgumentCount = declaringType is { IsGenericType: true } ? declaringType.GetGenericArguments().Length : 0;
+
+        var declaringTypePrefix = declaringTypeArgumentCount > 0
+            ? DescribeGenericType(declaringType!, typeArguments[..declaringTypeArgumentCount]) + "."
+            : "";
+
+        return declaringTypePrefix + DescribeTypeWithOwnArguments(type, typeArguments[declaringTypeArgumentCount..]);
+    }
+
+    private static string DescribeTypeWithOwnArguments(Type type, Type[] ownTypeArguments)
+    {
+        var name = RemoveGenericArity(type.Name);
+
+        return ownTypeArguments.Length == 0
+            ? name
+            : $"{name}<{string.Join(", ", ownTypeArguments.Select(x => x.DescribeType()))}>";
     }
 
     private static string RemoveGenericArity(string typeName)

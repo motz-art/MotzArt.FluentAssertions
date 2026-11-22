@@ -117,7 +117,8 @@ public class DescribeValuesExtensionsTests
     [TestCase(typeof(TimeSpan), "TimeSpan")]
     [TestCase(typeof(List<int>), "List<int>")]
     [TestCase(typeof(Dictionary<string, List<int?>>), "Dictionary<string, List<int?>>")]
-    [TestCase(typeof(Dictionary<int, string>.KeyCollection), "KeyCollection<int, string>")]
+    [TestCase(typeof(Dictionary<int, string>.KeyCollection), "Dictionary<int, string>.KeyCollection")]
+    [TestCase(typeof(Outer<int>.Inner<string>), "Outer<int>.Inner<string>")]
     public void DescribeType_ShouldDescribeTypeAsInCSharpSource(Type type, string expected)
     {
         type.DescribeType().ShouldBe(expected);
@@ -168,6 +169,11 @@ public class DescribeValuesExtensionsTests
     }
 
     private sealed record Point(int X, int Y);
+
+    private sealed class Outer<T>
+    {
+        public sealed class Inner<TInner>;
+    }
 
     private sealed class PlainValue
     {
