@@ -8,9 +8,13 @@ namespace MotzArt.FluentAssertions.Tests.StoreTests
         private const string FixtureValue = $"Value From {nameof(ParallelTestStoreTests)}";
         private const string TestKey = "ParallelTestKey";
 
+        private const int MaxTestCount = 8;
+
+        private static readonly int TestCount = Math.Min(MaxTestCount, Math.Max(Environment.ProcessorCount, 2));
+
         private static readonly CountdownEvent AllTestsStarted = new(TestCount);
 
-        private const int TestCount = 8;
+        private static readonly TimeSpan OverlapTimeout = TimeSpan.FromSeconds(10);
 
         public static IEnumerable<int> TestIndexes => Enumerable.Range(0, TestCount);
 
@@ -49,7 +53,7 @@ namespace MotzArt.FluentAssertions.Tests.StoreTests
         private static void WaitForOtherTestsToSetTheirValues()
         {
             AllTestsStarted.Signal();
-            AllTestsStarted.Wait(TimeSpan.FromSeconds(5));
+            AllTestsStarted.Wait(OverlapTimeout).ShouldBeTrue($"Expected all {TestCount} test cases to run at the same time.");
         }
     }
 }
