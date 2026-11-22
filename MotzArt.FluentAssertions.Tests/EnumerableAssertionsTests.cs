@@ -525,6 +525,13 @@ public class EnumerableAssertionsTests
     }
 
     [Test]
+    public void ShouldNotContainItem_ShouldPassForAbsentItemOfDerivedType()
+    {
+        var items = new List<object> { 1, "two" };
+        items.ShouldNotContain("three");
+    }
+
+    [Test]
     public void ShouldNotContainItem_ShouldFailWhenItemIsPresent()
     {
         var list = new List<int> { 1, 2, 3 };
