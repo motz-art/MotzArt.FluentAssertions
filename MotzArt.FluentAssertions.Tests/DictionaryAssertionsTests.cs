@@ -151,4 +151,79 @@ public class DictionaryAssertionsTests
 
                                """);
     }
+
+    [Test]
+    public void DictionaryOverloads_ShouldReturnDictionaryForChaining()
+    {
+        Dictionary<string, int> result = ages
+            .ShouldNotContainKey("Carol")
+            .ShouldContainValue(30)
+            .ShouldNotContainValue(40);
+
+        result.ShouldBeSameAs(ages);
+    }
+
+    [Test]
+    public void IDictionaryOverloads_ShouldPassAndReturnSourceForChaining()
+    {
+        IDictionary<string, int> dictionary = ages;
+
+        IDictionary<string, int> result = dictionary
+            .ShouldNotContainKey("Carol")
+            .ShouldContainValue(30)
+            .ShouldNotContainValue(40);
+
+        result.ShouldBeSameAs(dictionary);
+        dictionary.ShouldContainKey("Bob").ShouldBe(25);
+    }
+
+    [Test]
+    public void IDictionaryShouldContainKey_ShouldFailWhenKeyIsMissing()
+    {
+        IDictionary<string, int> dictionary = ages;
+        ShouldThrowAssertionException(() => dictionary.ShouldContainKey("Carol"))
+            .Message.ShouldBe($"""
+                                 Assert.That({nameof(dictionary)}, Does.ContainKey("Carol"))
+                                 Expected: dictionary containing key Carol
+                                 But was:  keys [Alice, Bob]
+
+                               """);
+    }
+
+    [Test]
+    public void IDictionaryShouldNotContainKey_ShouldFailWhenKeyIsPresent()
+    {
+        IDictionary<string, int> dictionary = ages;
+        ShouldThrowAssertionException(() => dictionary.ShouldNotContainKey("Alice"))
+            .Message.ShouldStartWith($"  Assert.That({nameof(dictionary)}, Does.Not.ContainKey(\"Alice\"))");
+    }
+
+    [Test]
+    public void IDictionaryShouldContainValue_ShouldFailWhenValueIsMissing()
+    {
+        IDictionary<string, int> dictionary = ages;
+        ShouldThrowAssertionException(() => dictionary.ShouldContainValue(40))
+            .Message.ShouldStartWith($"  Assert.That({nameof(dictionary)}, Does.ContainValue(40))");
+    }
+
+    [Test]
+    public void IDictionaryShouldNotContainValue_ShouldFailWhenValueIsPresent()
+    {
+        IDictionary<string, int> dictionary = ages;
+        ShouldThrowAssertionException(() => dictionary.ShouldNotContainValue(30))
+            .Message.ShouldStartWith($"  Assert.That({nameof(dictionary)}, Does.Not.ContainValue(30))");
+    }
+
+    [Test]
+    public void IDictionaryOverloads_ShouldFailForNull()
+    {
+        IDictionary<string, int>? dictionary = null;
+        ShouldThrowAssertionException(() => dictionary.ShouldContainKey("Carol"))
+            .Message.ShouldBe($"""
+                                 Assert.That({nameof(dictionary)}, Is.Not.Null)
+                                 Expected: not null
+                                 But was:  null
+
+                               """);
+    }
 }
