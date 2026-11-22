@@ -568,4 +568,51 @@ public class StringAssertionsTests
 
                                """);
     }
+
+    [Test]
+    public void ShouldStartWith_WithStringComparison_ShouldFailForNull()
+    {
+        string? actual = null;
+        ShouldThrowAssertionException(() => actual.ShouldStartWith("Hello", StringComparison.Ordinal))
+            .Message.ShouldBe($"""
+                                 Assert.That({nameof(actual)}, Does.StartWith("Hello").Using(StringComparison.Ordinal))
+                                 Expected: String starting with "Hello"
+                                 But was:  null
+
+                               """);
+    }
+
+    [Test]
+    public void ShouldEndWith_WithStringComparison_ShouldFailForNull()
+    {
+        string? actual = null;
+        ShouldThrowAssertionException(() => actual.ShouldEndWith("World!", StringComparison.Ordinal))
+            .Message.ShouldBe($"""
+                                 Assert.That({nameof(actual)}, Does.EndWith("World!").Using(StringComparison.Ordinal))
+                                 Expected: String ending with "World!"
+                                 But was:  null
+
+                               """);
+    }
+
+    [Test]
+    public void ShouldNotContain_WithStringComparison_ShouldPassForNull()
+    {
+        string? actual = null;
+        actual.ShouldNotContain("World", StringComparison.OrdinalIgnoreCase).ShouldBeNull();
+    }
+
+    [Test]
+    public void ShouldNotMatch_WithRegex_ShouldPassAndReturnStringWhenRegexDoesNotMatch()
+    {
+        var orderNumber = "ORD-ABC";
+        orderNumber.ShouldNotMatch(new Regex(@"^ORD-\d+$")).ShouldBeSameAs(orderNumber);
+    }
+
+    [Test]
+    public void ShouldNotMatch_WithRegex_ShouldPassForNull()
+    {
+        string? orderNumber = null;
+        orderNumber.ShouldNotMatch(new Regex(@"^ORD-\d+$")).ShouldBeNull();
+    }
 }
