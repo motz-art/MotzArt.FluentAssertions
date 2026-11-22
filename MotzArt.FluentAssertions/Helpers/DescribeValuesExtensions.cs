@@ -108,7 +108,7 @@ public static class DescribeValuesExtensions
 
         if (type.IsArray)
         {
-            return type.GetElementType().EnsureNotNull().DescribeType() + string.Join("", Enumerable.Repeat("[]", type.GetArrayRank()));
+            return type.GetElementType().EnsureNotNull().DescribeType() + "[" + new string(',', type.GetArrayRank() - 1) + "]";
         }
 
         if (type.IsGenericType)

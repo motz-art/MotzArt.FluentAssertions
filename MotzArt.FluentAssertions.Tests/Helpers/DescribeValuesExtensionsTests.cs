@@ -104,6 +104,7 @@ public class DescribeValuesExtensionsTests
     [TestCase(typeof(int?), "Int32?")]
     [TestCase(typeof(int[]), "Int32[]")]
     [TestCase(typeof(int[][]), "Int32[][]")]
+    [TestCase(typeof(int[,]), "Int32[,]")]
     [TestCase(typeof(int?[]), "Int32?[]")]
     [TestCase(typeof(List<int>), "List<Int32>")]
     [TestCase(typeof(Dictionary<string, List<int?>>), "Dictionary<String, List<Int32?>>")]
